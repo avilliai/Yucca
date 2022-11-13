@@ -17,7 +17,9 @@ mirai框架的简单插件。使用了mirai-api-http
   
   02
   --
-  修改bot.py
+  修改bot.py所在文件夹名为PythonPlugins
+  
+  修改bot.py 与mirai-api-http保持一致
   
   03
   --
