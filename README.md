@@ -15,16 +15,11 @@ mirai框架的简单插件。使用了mirai-api-http
   --
   下载模型并放在voiceModel文件夹下
   
-  install and put model(.pth) in voiceModel\\
-  
   02
   --
   修改bot.py
-  
-  edit bot.py
   
   03
   --
   打开cmd，运行pip install -r requirements.txt
   
-  cmd run pip install -r requirements.txt
