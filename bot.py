@@ -93,14 +93,14 @@ if __name__ == '__main__':
     def stop_scheduler(_):
         scheduler.shutdown(True)  # 结束定时器
     #摸鱼人日历
-    @scheduler.scheduled_job(CronTrigger(hour=16, minute=48))
+    @scheduler.scheduled_job(CronTrigger(hour=16, minute=50))
     async def timer():
         moyuPic=moyu()
         txt = r"Config\moyu\groups.txt"
         groupList = readConfig(txt)
         for i in groupList:
             intTrans = int(i)
-        await bot.send_group_message(intTrans, Image(path=moyuPic))
+            await bot.send_group_message(intTrans, Image(path=moyuPic))
 
     @scheduler.scheduled_job(CronTrigger(hour=16, minute=49))
     async def timer():
