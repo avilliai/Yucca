@@ -390,7 +390,7 @@ if __name__ == '__main__':
                     textt=str(event.message_chain).split("#")
                     if textt[1] in modelList:
                         model=int(textt[1])
-                        tex = '[ZH]'+textt[0]+'[ZH]'
+                        tex = '[ZH]'+((textt[0])[2:])+'[ZH]'
                     else:
                         model=0
                         tex = '[ZH]' + (str(event.message_chain)[2:]) + '[ZH]'
@@ -450,7 +450,7 @@ if __name__ == '__main__':
                     textt = str(event.message_chain).split("#")
                     if textt[1] in modelList:
                         model = int(textt[1])
-                        tex = '[JA]' + translate(textt[0]) + '[JA]'
+                        tex = '[JA]' + translate((textt[0])[1:]) + '[JA]'
                     else:
                         model = 0
                         tex = '[JA]' + translate(str(event.message_chain)[1:]) + '[JA]'
