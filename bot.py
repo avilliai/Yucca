@@ -393,9 +393,9 @@ if __name__ == '__main__':
                         tex = '[ZH]'+textt[0]+'[ZH]'
                     else:
                         model=0
-                        tex = '[ZH]' + (str(event.message_chain)) + '[ZH]'
+                        tex = '[ZH]' + (str(event.message_chain)[2:]) + '[ZH]'
                 else:
-                    tex = '[ZH]' + (str(event.message_chain)) + '[ZH]'
+                    tex = '[ZH]' + (str(event.message_chain)[2:]) + '[ZH]'
                     model=0
                 ranpath = random_str()
                 out = sys.argv[0][:-20]+'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
@@ -453,9 +453,9 @@ if __name__ == '__main__':
                         tex = '[JA]' + translate(textt[0]) + '[JA]'
                     else:
                         model = 0
-                        tex = '[JA]' + translate(str(event.message_chain)) + '[JA]'
+                        tex = '[JA]' + translate(str(event.message_chain)[1:]) + '[JA]'
                 else:
-                    tex = '[JA]' + translate(str(event.message_chain)) + '[JA]'
+                    tex = '[JA]' + translate(str(event.message_chain)[1:]) + '[JA]'
                     model=0
                 ranpath = random_str()
                 out = sys.argv[0][:-20]+'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
