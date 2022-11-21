@@ -35,51 +35,54 @@ def addReplys(ass):
     file = open('Config\\dict.txt', 'w')
     file.write(js)
     file.close()
-    return '添加完成'
+    print(type(dict))
+    return dict
 
 
 
-#dict[messageS[0]]=messageS[1]
-#print(dict)
+
 
 
 def dels(messagess):
-    file = open('plugins\\Config\\dict.txt', 'w')
+    file = open('Config\\dict.txt', 'r')
     js = file.read()
     dict = json.loads(js)
     messageS=messagess[2:]
-    if (messageS in dict):
+    try:
         dict.pop(messageS)
-        js = json.dumps(dict)
-        file = open('plugins\\Config\\dict.txt', 'w')
-        file.write(js)
-        file.close()
-        return '已删除'
-    else:
-        return '似乎没有对应的关键词'
-'''def main(bot):
-    @bot.on(Startup)
-    async def avillia(event: Startup):
-        while True:
-            avillia
+    except:
+        print('没有指定的关键词')
+        return 1
+    js = json.dumps(dict)
+    file = open('Config\\dict.txt', 'w')
+    file.write(js)
+    file.close()
+    return dict
 
-    @bot.on(GroupMessage)
-    async def avillia(event: GroupMessage):
-        replyMes = reply(str(event.message_chain))
-        if replyMes != 0:
-            if len(replyMes) < 40:
-                ran = random.randint(0, 1)
-                if ran == 0:
-                    ranpath = random_str()
-                    out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                    tex = '[JA]' + translate(replyMes) + '[JA]'
-                    voiceGenerate(tex, out)
-                    await bot.send(event, Voice(path=out))'''
+def delValue(key,valueNo):
+    file = open('Config\\dict.txt', 'r')
+    js = file.read()
+    dict = json.loads(js)
+    if key in dict.keys():
+        values=dict.get(key)
+        try:
+            value1=values.remove(valueNo)
+            dict[key]=value1
+        except:
+            print('没有指定词')
+    else:
+        print('没有指定词')
+    js = json.dumps(dict)
+    file = open('Config\\dict.txt', 'w')
+    file.write(js)
+    file.close()
+    return dict
 
 
 #with open("config\\replyDic.txt",'a') as f:
 if __name__ == '__main__':
     print('当前路径' + sys.argv[0])
-    addReplys('avillia#1111111')
+    while True:
+        addReplys(input('请输入'))
 
 

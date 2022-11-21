@@ -4,7 +4,7 @@ import requests
 
 from plugins.RandomStr.RandomStr import random_str
 
-url = 'https://iw233.cn/api.php?sort=yin' # 接口地址
+url = 'https://iw233.cn/api.php?sort=random' # 接口地址
 headers ={
     'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36'
 }
