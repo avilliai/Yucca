@@ -1,37 +1,25 @@
 import json
 import random
-import os
-
-import aiohttp
-import mirai.models.events
-
-import asyncio
-import datetime
-
-from mirai import Mirai, WebSocketAdapter, Startup, Shutdown, Face
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
-
-from mirai import Image, Voice
-from mirai import Mirai, WebSocketAdapter, FriendMessage, GroupMessage, At, Plain
-from pygments import plugin
-
-from MoeGoe import voiceGenerate
-
 import sys
 
-#from plugins import biliMonitor, signPlugin
-from plugins.Covid import getCovid
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
+from mirai import Image, Voice
+from mirai import Mirai, WebSocketAdapter, FriendMessage, GroupMessage, At, Plain
+from mirai import Startup, Shutdown
 
+from MoeGoe import voiceGenerate
+# from plugins import biliMonitor, signPlugin
+from plugins.Covid import getCovid
 from plugins.RandomStr.RandomStr import random_str
-from plugins.abstractMess import emoji,pinyin
+from plugins.abstractMess import emoji, pinyin
 from plugins.charPicture import painter
 from plugins.cpGenerate import get_cp_mesg
 from plugins.dictPicDown import dict_download_img
-from plugins.easyReply import addReplys, dels, delValue
+from plugins.easyReply import addReplys, dels
 from plugins.gitZen import get_zen
+from plugins.imgMaker import qinqin, get_user_image_url, laopo, jiehun
 from plugins.jokeMaker import get_joke
-
 from plugins.moyu import moyu
 from plugins.newsEveryday import news
 from plugins.peroDog import pero_dog_contents
@@ -40,7 +28,7 @@ from readConfig import readConfig
 from trans import translate
 
 if __name__ == '__main__':
-    bot = Mirai(3093724179, adapter=WebSocketAdapter(
+    bot = Mirai(3552663628, adapter=WebSocketAdapter(
         verify_key='1234567890', host='localhost', port=23456
     ))
     #翻字典
@@ -52,6 +40,7 @@ if __name__ == '__main__':
     value=''
     status=0
     sender=0
+    voiceMode=0
     #私聊内容
     @bot.on(FriendMessage)
     async def on_friend_message(event: FriendMessage):
@@ -65,10 +54,6 @@ if __name__ == '__main__':
             await bot.send_group_message(event, 'yucca测试版YIRIS启动成功！')#向消息来源发送消息
 
             # print(str(event.message_chain))  # 打印消息内容
-
-    @bot.on(mirai.models.events.NudgeEvent)
-    async def handle_nudge_message(event: mirai.models.events.NudgeEvent):
-       await bot.send_nudge(target=1840094972,subject=3093724179,kind='Friend')
 
     #图片模块
     @bot.on(GroupMessage)
@@ -121,7 +106,7 @@ if __name__ == '__main__':
         groupList = readConfig(txt)
         for i in groupList:
             intTrans = int(i)
-            index = random.randint(1, 4)
+            index = random.randint(1, 5)
             if index == 1:
                 ranpath = random_str()
                 out = sys.argv[0][:-20]+'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
@@ -140,6 +125,13 @@ if __name__ == '__main__':
                 tex = '[JA]' + translate('辛苦了，要注意休息哦。') + '[JA]'
                 voiceGenerate(tex, out)
                 await bot.send_group_message(intTrans, Voice(path=out))
+            if index > 3:
+                ranpath = random_str()
+                out = sys.argv[0][:-20]+'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
+                tex = '[JA]' + translate('今天也好好努力过了......今天也很棒了') + '[JA]'
+                voiceGenerate(tex, out)
+                await bot.send_group_message(intTrans, Voice(path=out))
+
 
     #早八新闻自动推送
     @scheduler.scheduled_job(CronTrigger(hour=7, minute=40))
@@ -216,7 +208,7 @@ if __name__ == '__main__':
             voiceGenerate(tex, out)
             await bot.send(event, Voice(path=out))
 
-    #天气查询模块
+    #天气查询
     import re
     import plugins.weatherQuery
     @bot.on(GroupMessage)
@@ -236,7 +228,7 @@ if __name__ == '__main__':
     # 对早的回复
     @bot.on(GroupMessage)
     def on_group_message(event: GroupMessage):
-        if  str(event.message_chain).startswith('早') :
+        if  str(event.message_chain)=='早安' or event.message_chain=='早' or event.message_chain=='早上好':
             if len(str(event.message_chain))<6:
                 index = random.randint(1, 4)
                 if index == 1:
@@ -264,23 +256,10 @@ if __name__ == '__main__':
                     voiceGenerate(tex, out)
                     return bot.send(event, Voice(path=out))
 
-
-    # 对艾特的回复
-    @bot.on(GroupMessage)
-    def on_group_message(event: GroupMessage):
-        if At(bot.qq) in event.message_chain:
-            index=random.randint(1,4)
-            if index==1:
-                return bot.send(event, [At(event.sender.id), ' 你在叫我吗？'])
-            if index==2:
-                return bot.send(event, [At(event.sender.id), ' 唉，怎么了。我做了什么奇怪的事情吗'])
-            if index==3:
-                return bot.send(event, [At(event.sender.id), ' 做什么呢'])
-
     #不准亲
     @bot.on(GroupMessage)
     async def on_group_message(event: GroupMessage):
-        if str(event.message_chain).endswith('亲亲') :
+        if ('亲亲' in event.message_chain) and (At(bot.qq) in event.message_chain) :
             index = random.randint(1, 4)
             if index==1:
                 ranpath = random_str()
@@ -299,15 +278,11 @@ if __name__ == '__main__':
                 voiceGenerate(tex, out)
                 return bot.send(event, Voice(path=out))
             if index==3:
-                ranpath = random_str()
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]' + translate('一块钱亲一口~，怎么样!?.......很划算吧') + '[JA]'
                 await bot.send(event,Image(path=sys.argv[0][:-20] + 'PythonPlugins\\plugins\\PICTURE\\p2\\13.jpg'))
-                voiceGenerate(tex, out)
-                return bot.send(event, Voice(path=out))
+                return bot.send(event, '一块钱亲一下~，怎么样!?.......很划算吧')
+            else:
+                return bot.send(event,Image(path='plugins\\PICTURE\\p2\\22.jpg'))
 
-        else:
-            return
 
     #对不对？
     @bot.on(GroupMessage)
@@ -352,7 +327,7 @@ if __name__ == '__main__':
     #对日日的回复
     @bot.on(GroupMessage)
     async def on_group_message(event: GroupMessage):
-        if str(event.message_chain)=='日日':
+        if str(event.message_chain)=='日日' or ((('日日' in event.message_chain) or ('透' in event.message_chain) ) and (At(bot.qq) in event.message_chain)):
             index = random.randint(1, 11)
             if index == 1:
                 await bot.send(event, [At(event.sender.id), ' 又开始了，又开始了......'])
@@ -371,7 +346,7 @@ if __name__ == '__main__':
             if index ==4:
                 ranpath = random_str()
                 out = sys.argv[0][:-20]+'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[ZH]……哈~……哈~……嗯~……嗯啊~……不……不要~……咦咦咦啊啊啊啊啊啊~……[ZH]'
+                tex = '[ZH]……哈~……哈~……嗯~……嗯啊~……不……不~……咦咦咦啊啊啊啊啊啊~……[ZH]'
                 voiceGenerate(tex, out)
                 await bot.send(event, Image(path=sys.argv[0][:-20]+'PythonPlugins\\plugins\\PICTURE\\p2\\10.jpg'))
                 return bot.send(event, Voice(path=out))
@@ -443,38 +418,61 @@ if __name__ == '__main__':
                 voiceGenerate(tex, out)
                 await bot.send(event, Voice(path=out))
 
-    #或许是功能菜单
+    #喜欢
     @bot.on(GroupMessage)
     async def on_group_message(event: GroupMessage):
-        if str(event.message_chain)=='/help':
-            index = random.randint(1, 5)
+        if (At(bot.qq) in event.message_chain) and (('老婆' in event.message_chain) or ('喜欢' in event.message_chain)) :
+            index = random.randint(1, 6)
             if index == 1:
                 ranpath = random_str()
                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]' + translate('这是所有的功能菜单') + '[JA]'
+                tex = '[JA]' + translate('不可以的吧，说这种话绝对不行的！') + '[JA]'
                 voiceGenerate(tex, out)
                 return bot.send(event, Voice(path=out))
             if index == 2:
                 ranpath = random_str()
                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]唉？想看我的功能菜单吗？？~真拿你没办法呢.....只准看一次哦......[JA]'
+                tex = '[JA]'+translate('真拿你没办法呢.....只准一次哦......')+'[JA]'
                 voiceGenerate(tex, out)
+                await bot.send(event,Image(path='plugins\\PICTURE\\haiXiu\\5.jpg'))
                 return bot.send(event, Voice(path=out))
             if index == 3:
-                ranpath = random_str()
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]' + translate('这是什么意思呢，连我的功能都不清楚吗？......') + '[JA]'
-                voiceGenerate(tex, out)
-                return bot.send(event, Voice(path=out))
-            if index > 3:
-                ranpath = random_str()
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]' + translate('稍等呀，很快就有了~') + '[JA]'
-                voiceGenerate(tex, out)
-                return bot.send(event, Voice(path=out))
+                await bot.send(event,'果然是个变态......随便就把这种话说出来了.....\n看来没办法了呢')
+                return bot.send(event, Image(path='plugins\\PICTURE\\haiXiu\\21.png'))
+            if index ==4:
+                await bot.send(event, '哦，知道了')
+                return bot.send(event, Image(path='plugins\\PICTURE\\haiXiu\\16.jpg'))
+            else:
+                await bot.send(event,Image(path='plugins\\PICTURE\\haiXiu\\22.jpg'))
 
-    #反6工具
+
     @bot.on(GroupMessage)
+    async def on_group_message(event: GroupMessage):
+        if (At(bot.qq) in event.message_chain) and (('抱' in event.message_chain) or ('摸' in event.message_chain)):
+            index = random.randint(1, 6)
+            if index == 1:
+                ranpath = random_str()
+                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
+                tex = '[JA]' + translate('可以的哦......最喜欢这样了....') + '[JA]'
+                voiceGenerate(tex, out)
+                return bot.send(event, Voice(path=out))
+            if index == 2:
+                ranpath = random_str()
+                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
+                tex = '[JA]' + translate('真拿你没办法呢.....只准一次哦......') + '[JA]'
+                voiceGenerate(tex, out)
+                await bot.send(event, Image(path='plugins\\PICTURE\\haiXiu\\5.jpg'))
+                return bot.send(event, Voice(path=out))
+            if index == 3:
+                await bot.send(event, '果然是个变态......随便就把这种话说出来了.....\n看来没办法了呢')
+                return bot.send(event, Image(path='plugins\\PICTURE\\haiXiu\\21.png'))
+            if index == 4:
+                await bot.send(event, '哦，知道了')
+                return bot.send(event, Image(path='plugins\\PICTURE\\haiXiu\\16.jpg'))
+            else:
+                await bot.send(event, Image(path='plugins\\PICTURE\\haiXiu\\22.jpg'))
+    #反6工具
+    '''@bot.on(GroupMessage)
     async def on_group_message(event: GroupMessage):
         if str(event.message_chain) == '6':
             index = random.randint(1, 5)
@@ -507,7 +505,7 @@ if __name__ == '__main__':
                 voiceGenerate(tex, out)
                 await bot.send(event,'随便说六是不可以的~')
                 await bot.send(event, Image(path=sys.argv[0][:-20] + 'PythonPlugins\\plugins\\PICTURE\\p2\\5.jpg'))
-                return bot.send(event, Voice(path=out))
+                return bot.send(event, Voice(path=out))'''
 
     #日语生成
     @bot.on(GroupMessage)
@@ -589,11 +587,14 @@ if __name__ == '__main__':
                 await bot.send(event,'已追加')
 
         # 戳一戳
-    '''@bot.on(NudgeEvent)
-    async def NudgeEvent(event: NudgeEvent):
-        s = ['你在想什么呢？', '不要戳了......', '检测到外部撞击', '这是什么？', '嗯？很有趣吗......', '不能理解的行为.....有什么含义吗', '戳一次十块!','别戳了，再戳就坏掉了']
-        tex=random.choice(s)'''
 
+
+    #菜单
+    @bot.on(GroupMessage)
+    async def help(event: GroupMessage):
+        if '帮助' in event.message_chain:
+            await bot.send(event,Image(path='Config\\help.png'))
+            await bot.send(event,'这是yucca的功能列表\nヾ(≧▽≦*)o')
 
 
     #抽象话
@@ -677,7 +678,7 @@ if __name__ == '__main__':
                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\XXX (Feat.V在燃烧).mp3'
                 await bot.send(event, Voice(path=out))
 
-
+    #la la run
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain) == 'ba':
@@ -687,6 +688,16 @@ if __name__ == '__main__':
                 await bot.send(event, Voice(path=out))
 
     #添加回复
+    @bot.on(GroupMessage)
+    async def handle_group_message(event: GroupMessage):
+        if str(event.message_chain) == '添加语音':
+            global sender
+            sender = event.sender.id
+            await bot.send(event, '请输入关键词')
+            global status
+            status = 1
+            global voiceMode
+            voiceMode=1
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain) == '开始添加':
@@ -702,26 +713,42 @@ if __name__ == '__main__':
             if event.sender.id==sender:
                 global key
                 key=str(event.message_chain)
-                await bot.send(event, '已记录关键词'+key)
+                await bot.send(event, '已记录关键词,请发送回复')
                 status = 2
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         global status
         if status==2:
             global key
+            global voiceMode
+            baner=0
             if event.sender.id == sender:
-                if event.message_chain.count(Image) == 1:
-                    lst_img = event.message_chain.get(Image)
-                    path = lst_img[0].url
-                    imgname = dict_download_img(path)
-                    value =imgname
-                else:
-                    value = str(event.message_chain)
-                global dict
-                addStr='添加'+key+'#'+value
-                dict = addReplys(addStr)
-                status = 0
-                await bot.send(event, '已添加至词库')
+                ban=['妈','主人','狗','老公','老婆','爸','奶','爷','党']
+                for i in ban:
+                    if i in event.message_chain:
+                        await bot.send(event,'似乎是不合适的词呢.....')
+                        baner=1
+                        key=''
+                        status=0
+                if baner!=1:
+                    if voiceMode==1:
+                        ranpath = random_str()
+                        path = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
+                        tex = '[JA]' + translate(str(event.message_chain)) + '[JA]'
+                        voiceGenerate(tex, path)
+                        value=ranpath+'.wav'
+                    elif event.message_chain.count(Image) == 1:
+                        lst_img = event.message_chain.get(Image)
+                        path = lst_img[0].url
+                        imgname = dict_download_img(path)
+                        value =imgname
+                    else:
+                        value = str(event.message_chain)
+                    global dict
+                    addStr='添加'+key+'#'+value
+                    dict = addReplys(addStr)
+                    status = 0
+                    await bot.send(event, '已添加至词库')
 
     #自定义词库的废案
     '''@bot.on(GroupMessage)
@@ -756,6 +783,8 @@ if __name__ == '__main__':
             replyMes=random.choice(dict.get(str(event.message_chain)))
             if str(replyMes).endswith('.png'):
                 await bot.send(event,Image(path='pictures\\dictPic\\'+replyMes))
+            elif str(replyMes).endswith('.wav'):
+                await bot.send(event, Voice(path='plugins\\voices\\' + replyMes))
             else:
                 await bot.send(event,replyMes)
     #删除关键字
@@ -763,14 +792,72 @@ if __name__ == '__main__':
     async def dele(event: GroupMessage):
         if str(event.message_chain).startswith('删除'):
             #调用词库删除函数
-            s=dels(str(event.message_chain))
+            try:
+                s=dels(str(event.message_chain))
+            except:
+                pass
             global dict
             dict=s
             await bot.send(event,'已删除关键词：'+(str(event.message_chain)[2:]))
+    #制图
+    @bot.on(GroupMessage)
+    async def qinqins(event: GroupMessage):
+        if event.message_chain.count(At)==1 and ('kiss' in event.message_chain):
+            #获取头像的url
+            img_url=get_user_image_url(event.message_chain.get(At)[0].target)
+            try:
+                paths = qinqin(img_url)
+            except:
+                print('error')
+            await bot.send(event, Image(path=paths))
+        elif event.message_chain.count(Image)==1 and ('kiss' in event.message_chain):
+            lst_img = event.message_chain.get(Image)
+            img_url = lst_img[0].url
+            try:
+                paths = qinqin(img_url)
+            except:
+                print('error')
+            await bot.send(event, Image(path=paths))
 
+    #老婆
+    @bot.on(GroupMessage)
+    async def qinqins(event: GroupMessage):
+        if event.message_chain.count(At) == 1 and ('mywife' in event.message_chain):
+            # 获取头像的url
+            img_url = get_user_image_url(event.message_chain.get(At)[0].target)
+            try:
+                paths = laopo(img_url)
+            except:
+                print('error')
+            await bot.send(event, Image(path=paths))
+        elif event.message_chain.count(Image) == 1 and ('mywife' in event.message_chain):
+            lst_img = event.message_chain.get(Image)
+            img_url = lst_img[0].url
+            try:
+                paths = laopo(img_url)
+            except:
+                print('error')
+            await bot.send(event, Image(path=paths))
 
-
-
+    #结婚
+    @bot.on(GroupMessage)
+    async def qinqins(event: GroupMessage):
+        if event.message_chain.count(At) == 1 and ('marry' in event.message_chain):
+            # 获取头像的url
+            img_url = get_user_image_url(event.message_chain.get(At)[0].target)
+            try:
+                paths = jiehun(img_url)
+            except:
+                print('error')
+            await bot.send(event, Image(path=paths))
+        elif event.message_chain.count(Image) == 1 and ('marry' in event.message_chain):
+            lst_img = event.message_chain.get(Image)
+            img_url = lst_img[0].url
+            try:
+                paths = jiehun(img_url)
+            except:
+                print('error')
+            await bot.send(event, Image(path=paths))
     #biliMonitor.main(bot)
     #signPlugin.main(bot)
     bot.run()

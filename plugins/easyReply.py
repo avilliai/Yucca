@@ -5,7 +5,7 @@ import sys
 import json
 
 
-
+#可以优化，bot.py中增加方式已经更新，但我懒得改
 def addReplys(ass):
     message=ass[2:]
     messageS=message.split('#')
@@ -28,14 +28,14 @@ def addReplys(ass):
     #没有关键字则创建
     else:
         dict[messageS[0]] = [messageS[1],]
-        print(dict)
+        #print(dict)
     #重新写入
-    print(dict)
+    #print(dict)
     js = json.dumps(dict)
     file = open('Config\\dict.txt', 'w')
     file.write(js)
     file.close()
-    print(type(dict))
+    #print(type(dict))
     return dict
 
 
@@ -82,7 +82,15 @@ def delValue(key,valueNo):
 #with open("config\\replyDic.txt",'a') as f:
 if __name__ == '__main__':
     print('当前路径' + sys.argv[0])
+    file = open('Config\\dict.txt', 'r')
+    js = file.read()
+    dict = json.loads(js)
+    print('已读取字典')
+    print(dict)
     while True:
-        addReplys(input('请输入'))
-
+        s=input('输入命令')
+        if s.startswith('添加'):
+            print(addReplys(s))
+        elif s.startswith('删除'):
+            print(dels(s))
 
