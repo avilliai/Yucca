@@ -81,6 +81,31 @@ def jiehun(url):
     s='pictures\\imgs.png'
     st.save('pictures\\imgs.png')
     return s'''
+def riyixia(url):
+    fileName=dict_download_img(url)
+    file="pictures\\dictPic\\"+fileName
+    #剪切图像
+    infile = file
+    outfile = 'pictures/cutted.png'
+    im = Image.open(infile)
+    (x, y) = im.size  # read image size
+    x_s = 500  # define standard width
+    y_s = 500  # calc height based on standard width
+    out = im.resize((x_s, y_s), Image.ANTIALIAS)
+    out.save(outfile)
+    #发起超级融合
+    st = Image.open(outfile)
+    st2 = Image.open("D:\Mirai\YirisVoiceGUI\PythonPlugins\plugins\PICTURE\\5.png")
+
+    im = st2
+    mark = st
+    layer = Image.new('RGBA', im.size, (0, 0, 0, 0))
+    layer.paste(mark, (80,99))
+    out = Image.composite(layer, im, layer)
+    out.save('pictures\\imgs.png')
+    return 'pictures\\imgs.png'
+
+
 
 if __name__ == '__main__':
-    print(jiehun('https://q4.qlogo.cn/g?b=qq&nk=919467430&s=640'))
+    print(riyixia('https://q4.qlogo.cn/g?b=qq&nk=919467430&s=640'))

@@ -37,6 +37,25 @@ def addReplys(ass):
     file.close()
     #print(type(dict))
     return dict
+def add(key,value):
+    file = open('Config\\dict.txt', 'r')
+    js = file.read()
+    dict = json.loads(js)
+    print('已读取字典')
+    #print(dict)
+    #print('---------')
+    file.close()
+
+    dict[key] = value
+        #print(dict)
+    #重新写入
+    #print(dict)
+    js = json.dumps(dict)
+    file = open('Config\\dict.txt', 'w')
+    file.write(js)
+    file.close()
+    #print(type(dict))
+    return dict
 
 
 
