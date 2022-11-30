@@ -35,3 +35,4 @@ if __name__ == '__main__':
         while i<=10:
             pic()
             i+=1
+

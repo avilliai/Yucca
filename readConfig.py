@@ -8,7 +8,7 @@ def readConfig(txt):
     while line:
         line = f.readline()
         data_list.append(line)
-        print(line)
+
     f.close()
     return data_list
 

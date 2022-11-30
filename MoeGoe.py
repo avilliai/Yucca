@@ -109,30 +109,6 @@ def voiceGenerate(tex,out,spealerIDDD=0):
     _ = net_g_ms.eval()
     utils.load_checkpoint(model, net_g_ms)
 
-    def voice_conversion():
-        audio_path = input('Path of an audio file to convert:\n')
-        print_speakers(speakers)
-        audio = utils.load_audio_to_torch(
-            audio_path, hps_ms.data.sampling_rate)
-
-        originnal_id = get_speaker_id('Original speaker ID: ')
-        target_id = get_speaker_id('Target speaker ID: ')
-        out_path = input('Path to save: ')
-
-        y = audio.unsqueeze(0)
-
-        spec = spectrogram_torch(y, hps_ms.data.filter_length,
-                                 hps_ms.data.sampling_rate, hps_ms.data.hop_length, hps_ms.data.win_length,
-                                 center=False)
-        spec_lengths = LongTensor([spec.size(-1)])
-        sid_src = LongTensor([originnal_id])
-
-        with no_grad():
-            sid_tgt = LongTensor([target_id])
-            audio = net_g_ms.voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_tgt)[
-                0][0, 0].data.cpu().float().numpy()
-        return audio, out_path
-
     while True:
         choice = 't'  # input('TTS or VC? (t/v):')
         if choice == 't':
@@ -173,13 +149,65 @@ def voiceGenerate(tex,out,spealerIDDD=0):
         print('Successfully saved!')
         break
 
+def voice_conversion(sourcepath,speaker=0):
+    if '--escape' in sys.argv:
+        escape = True
+    else:
+        escape = False
+
+    model = 'voiceModel\\1374_epochs.pth'#input('Path of a VITS model: ')
+    config ='voiceModel\\config.json'#input('Path of a config file: ')
+
+    hps_ms = utils.get_hparams_from_file(config)
+    n_speakers = hps_ms.data.n_speakers if 'n_speakers' in hps_ms.data.keys() else 0
+    n_symbols = len(hps_ms.symbols) if 'symbols' in hps_ms.keys() else 0
+    speakers = hps_ms.speakers if 'speakers' in hps_ms.keys() else ['0']
+    use_f0 = hps_ms.data.use_f0 if 'use_f0' in hps_ms.data.keys() else False
+    emotion_embedding = hps_ms.data.emotion_embedding if 'emotion_embedding' in hps_ms.data.keys() else False
+
+    net_g_ms = SynthesizerTrn(
+        n_symbols,
+        hps_ms.data.filter_length // 2 + 1,
+        hps_ms.train.segment_size // hps_ms.data.hop_length,
+        n_speakers=n_speakers,
+        emotion_embedding=emotion_embedding,
+        **hps_ms.model)
+    _ = net_g_ms.eval()
+    utils.load_checkpoint(model, net_g_ms)
+
+    audio_path = sourcepath
+    audio = utils.load_audio_to_torch(
+        audio_path, hps_ms.data.sampling_rate)
+
+    originnal_id = speaker
+    target_id = 3
+    out_path = 'plugins\\voices\\sing\\out.wav'
+
+    y = audio.unsqueeze(0)
+
+    spec = spectrogram_torch(y, hps_ms.data.filter_length,
+                             hps_ms.data.sampling_rate, hps_ms.data.hop_length, hps_ms.data.win_length,
+                             center=False)
+    spec_lengths = LongTensor([spec.size(-1)])
+    sid_src = LongTensor([originnal_id])
+
+    with no_grad():
+        sid_tgt = LongTensor([target_id])
+        audio = net_g_ms.voice_conversion(spec, spec_lengths, sid_src=sid_src, sid_tgt=sid_tgt)[
+            0][0, 0].data.cpu().float().numpy()
+    write(out_path, hps_ms.data.sampling_rate, audio)
+    print('Successfully saved!')
+    return out_path
+
+
 if __name__ == '__main__':
-    ranpath = random_str()
+    voice_conversion("plugins/voices/sing/rest.wav")
+    '''ranpath = random_str()
     Path=sys.argv[0][:-23]
     print(Path)
     out = Path+'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
     tex = '[JA]' + translate('你想说什么呢，我在听.....') + '[JA]'
-    voiceGenerate(tex, out)
+    voiceGenerate(tex, out)'''
     '''if '--escape' in sys.argv:
         escape = True
     else:

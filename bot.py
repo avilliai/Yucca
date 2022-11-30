@@ -3,15 +3,19 @@
 import json
 import random
 import sys
+import time
 
+from fuzzywuzzy import fuzz,process
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from mirai import Image, Voice
 from mirai import Mirai, WebSocketAdapter, FriendMessage, GroupMessage, At, Plain
 from mirai import Startup, Shutdown
-
-from MoeGoe import voiceGenerate
+from mirai.models import BotJoinGroupEvent, MemberCardChangeEvent
+from graiax import silkcoder
+from MoeGoe import voiceGenerate, voice_conversion
 # from plugins import biliMonitor, signPlugin
+from plugins import manager
 from plugins.Covid import getCovid
 from plugins.RandomStr.RandomStr import random_str
 from plugins.abstractMess import emoji, pinyin
@@ -20,13 +24,16 @@ from plugins.cpGenerate import get_cp_mesg
 from plugins.dictPicDown import dict_download_img
 from plugins.easyReply import addReplys, dels, add
 from plugins.gitZen import get_zen
-from plugins.imgMaker import qinqin, get_user_image_url, laopo, jiehun
+from plugins.imgMaker import qinqin, get_user_image_url, laopo, jiehun, riyixia, warn
 from plugins.jokeMaker import get_joke
+from plugins.mohuReply import mohuaddReplys, mohudels
 from plugins.moyu import moyu
 from plugins.newsEveryday import news
 from plugins.peroDog import pero_dog_contents
 from plugins.picGet import pic
+from plugins.tarot import tarotChoice
 from readConfig import readConfig
+from run import mohuReply, tarot, imgMakerRun
 from trans import translate
 
 if __name__ == '__main__':
@@ -37,13 +44,36 @@ if __name__ == '__main__':
     js = file.read()
     dict = json.loads(js)
     print('已读取字典')
+
+    file = open('Config\\superDict.txt', 'r')
+    jss = file.read()
+    superDict = json.loads(jss)
+    mohuKeys=superDict.keys()
+    print('已读取模糊匹配字典')
+
+
+    severGroups=readConfig(r"Config\moyu\groups.txt")
+    print('已读取服务群聊')
+
     key=''
     value=''
     status=0
-    sender=0
+    sendera=0
     voiceMode=0
     delete=0
+
+    mohukey = ''
+    mohuvalue = ''
+    mohustatus = 0
+    mohusendera = 0
+    mohuvoiceMode = 0
+    mohudelete = 0
+
     delsender=0
+    zifuhua=0
+
+    voiceSender=0
+    voiceTrans=0
     # 私聊内容
     '''@bot.on(FriendMessage)
     async def on_friend_message(event: FriendMessage):
@@ -51,10 +81,11 @@ if __name__ == '__main__':
             await bot.send(event, 'Hello World!')'''
 
     # 监听群聊消息
-    @bot.on(GroupMessage)
-    async def tests(event: GroupMessage):
-        if str(event.message_chain) == 'test':# event.message_chain是群友发的消息，每条都监听
-            await bot.send_group_message(event, 'yucca测试版YIRIS启动成功！')# 向消息来源发送消息
+    @bot.on(BotJoinGroupEvent)
+    async def tests():
+        await bot.send_friend_message(1840094972,'新加入了'+str(BotJoinGroupEvent.group.id))
+
+
 
             # print(str(event.message_chain))  # 打印消息内容
 
@@ -97,17 +128,19 @@ if __name__ == '__main__':
     @scheduler.scheduled_job(CronTrigger(hour=16, minute=50))
     async def timer():
         moyuPic=moyu()
-        txt = r"Config\moyu\groups.txt"
-        groupList = readConfig(txt)
-        for i in groupList:
+        global severGroups
+        for i in severGroups:
             intTrans = int(i)
-            await bot.send_group_message(intTrans, Image(path=moyuPic))
+            time.sleep(5)
+            try:
+                await bot.send_group_message(intTrans, Image(path=moyuPic))
+            except:
+                print('摸鱼日历发送出错')
 
     @scheduler.scheduled_job(CronTrigger(hour=16, minute=49))
     async def timer():
-        txt = r"Config\moyu\groups.txt"
-        groupList = readConfig(txt)
-        for i in groupList:
+        global severGroups
+        for i in severGroups:
             intTrans = int(i)
             index = random.randint(1, 5)
             if index == 1:
@@ -119,7 +152,7 @@ if __name__ == '__main__':
             if index == 2:
                 ranpath = random_str()
                 out = sys.argv[0][:-20]+'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]到下班时间了......[JA]'
+                tex = '[JA]到下班时间了......晚上去哪里玩呢?...[JA]'
                 voiceGenerate(tex, out)
                 await bot.send_group_message(intTrans, Voice(path=out))
             if index == 3:
@@ -140,16 +173,16 @@ if __name__ == '__main__':
     @scheduler.scheduled_job(CronTrigger(hour=7, minute=40))
     async def timer():
         newsPic = news()
-        txt = r"Config\moyu\groups.txt"
-        groupList = readConfig(txt)
-        for i in groupList:
+        global severGroups
+        for i in severGroups:
             intTrans = int(i)
             ranpath = random_str()
             out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-            tex = '[JA]' + translate('早上好~........已经为您整理好了今天的新闻！.......有什么有趣的事情吗?') + '[JA]'
+            tex = '[JA]' + translate('早上好........已经为您整理好了今天的新闻！.......有什么有趣的事情吗?') + '[JA]'
             voiceGenerate(tex, out)
             try:
                 await bot.send_group_message(intTrans, Image(path=newsPic))
+                time.sleep(5)
                 await bot.send_group_message(intTrans, Voice(path=out))
             except:
                 print('没有对应的群')
@@ -157,9 +190,8 @@ if __name__ == '__main__':
     # 中午推送github禅语
     @scheduler.scheduled_job(CronTrigger(hour=12, minute=10))
     async def timer():
-        txt = r"Config\moyu\groups.txt"
-        groupList = readConfig(txt)
-        for i in groupList:
+        global severGroups
+        for i in severGroups:
             intTrans = int(i)
             ranpath = random_str()
             out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
@@ -175,9 +207,8 @@ if __name__ == '__main__':
     # 早八问候
     @scheduler.scheduled_job(CronTrigger(hour=8, minute=1))
     async def timer():
-        txt = r"Config\moyu\groups.txt"
-        groupList = readConfig(txt)
-        for i in groupList:
+        global severGroups
+        for i in severGroups:
             intTrans = int(i)
             index = random.randint(1, 4)
             if index == 1:
@@ -275,7 +306,7 @@ if __name__ == '__main__':
             if index==2:
                 ranpath = random_str()
                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]' + translate('你是看到谁都想亲吗.....真是奇怪的人呢~') + '[JA]'
+                tex = '[JA]' + translate('你是看到谁都想亲吗.....真是奇怪的人.....') + '[JA]'
                 await bot.send(event,'你是看到谁都想亲吗.....')
                 await bot.send(event,Image(path=sys.argv[0][:-20] + 'PythonPlugins\\plugins\\PICTURE\\p2\\5.jpg'))
                 voiceGenerate(tex, out)
@@ -456,7 +487,7 @@ if __name__ == '__main__':
             if index == 1:
                 ranpath = random_str()
                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]' + translate('可以的哦......最喜欢这样了....') + '[JA]'
+                tex = '[JA]' + translate('可以的哦，......最喜欢这样了....') + '[JA]'
                 voiceGenerate(tex, out)
                 return bot.send(event, Voice(path=out))
             if index == 2:
@@ -474,41 +505,6 @@ if __name__ == '__main__':
                 return bot.send(event, Image(path='plugins\\PICTURE\\haiXiu\\16.jpg'))
             else:
                 await bot.send(event, Image(path='plugins\\PICTURE\\haiXiu\\22.jpg'))
-    # 反6工具
-    '''@bot.on(GroupMessage)
-    async def on_group_message(event: GroupMessage):
-        if str(event.message_chain) == '6':
-            index = random.randint(1, 5)
-            if index == 1:
-                ranpath = random_str()
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]' + translate('不许说6!，不可以~绝对不行！') + '[JA]'
-                voiceGenerate(tex, out)
-                await bot.send(event, Voice(path=out))
-                return bot.send(event,Image(path=sys.argv[0][:-20] + 'PythonPlugins\\plugins\\PICTURE\\p2\\12.jpg'))
-            if index == 2:
-                ranpath = random_str()
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]唉？那是什么呢，很有趣吗.....[JA]'
-                voiceGenerate(tex, out)
-                await bot.send(event,Image(path=sys.argv[0][:-20] + 'PythonPlugins\\plugins\\PICTURE\\p2\\3.jpg'))
-                return bot.send(event, Voice(path=out))
-            if index == 3:
-                ranpath = random_str()
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]' + translate('这是什么......不是很理解.....') + '[JA]'
-                voiceGenerate(tex, out)
-                await bot.send(event,'这是什么......不是很理解.....')
-                await bot.send(event, Image(path=sys.argv[0][:-20] + 'PythonPlugins\\plugins\\PICTURE\\p2\\6.jpg'))
-                return bot.send(event, Voice(path=out))
-            if index > 3:
-                ranpath = random_str()
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]' + translate('说六是不可以的~') + '[JA]'
-                voiceGenerate(tex, out)
-                await bot.send(event,'随便说六是不可以的~')
-                await bot.send(event, Image(path=sys.argv[0][:-20] + 'PythonPlugins\\plugins\\PICTURE\\p2\\5.jpg'))
-                return bot.send(event, Voice(path=out))'''
 
     # 日语生成
     @bot.on(GroupMessage)
@@ -537,6 +533,63 @@ if __name__ == '__main__':
                 tex = '[JA]' + translate('不行,太长了哦.....') + '[JA]'
                 voiceGenerate(tex, out)
                 await bot.send(event, Voice(path=out))
+    #语音转换
+    '''@bot.on(GroupMessage)
+    async def voiceTan(event: GroupMessage):
+        if str(event.message_chain)=='语音转换':
+            global voiceSender
+            voiceSender=event.sender.id
+            global voiceTrans
+            voiceTrans=2
+            await bot.send(event,'请发送语音')
+
+    # 语音转化附件
+    @bot.on(GroupMessage)
+    async def voicetransa(event: GroupMessage):
+        global voiceSender
+        global voiceTrans
+        if event.message_chain.count(Voice):
+            if voiceTrans == 2:
+                if voiceSender == event.sender.id:
+                    s = event.message_chain.get(Voice)
+                    await Voice.download(s[0], 'plugins/voices/sing/rest.silk')
+                    silkcoder.decode("plugins/voices/sing/rest.silk", "plugins/voices/sing/rest.wav",
+                                     ffmpeg_para=["-ar", "44100"])
+                    print('over')
+                    paths = voice_conversion("plugins/voices/sing/rest.wav")
+                    await bot.send(event, Voice(path=paths))
+                    voiceSender = 0
+                    voiceTrans = 0'''
+
+
+
+    # 好友日语生成,因腾讯版本更新再不可用
+    '''@bot.on(FriendMessage)
+    async def handle_group_message(event: FriendMessage):
+        if str(event.message_chain).startswith('说'):
+            modelList = ['0', '1', '2', '3']
+            if len(str(event.message_chain)) < 280:
+                if '#' in str(event.message_chain):
+                    textt = str(event.message_chain).split("#")
+                    if textt[1] in modelList:
+                        model = int(textt[1])
+                        tex = '[JA]' + translate((textt[0])[1:]) + '[JA]'
+                    else:
+                        model = 0
+                        tex = '[JA]' + translate(str(event.message_chain)[1:]) + '[JA]'
+                else:
+                    tex = '[JA]' + translate(str(event.message_chain)[1:]) + '[JA]'
+                    model = 0
+                ranpath = random_str()
+                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
+                voiceGenerate(tex, out, model)
+                await bot.send(event, Voice(path=out))
+            else:
+                ranpath = random_str()
+                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
+                tex = '[JA]' + translate('不行,太长了哦.....') + '[JA]'
+                voiceGenerate(tex, out)
+                await bot.send(event, Voice(path=out))'''
 
     # 笑话生成
     @bot.on(GroupMessage)
@@ -656,12 +709,38 @@ if __name__ == '__main__':
     @bot.on(GroupMessage)
     async def charPic(event: GroupMessage):
         if str(event.message_chain).startswith('字符画'):
-            lst_img = event.message_chain.get(Image)
-            print('已接收命令')
-            await bot.send(event,'正在生成.....请稍候....')
-            path=painter(lst_img[0].url)
-            await bot.send(event,Image(path=path))
-            # print(lst_img[0].url)
+            if event.message_chain.count(Image)==1:
+                lst_img = event.message_chain.get(Image)
+                print('已接收命令')
+                await bot.send(event,'正在生成.....请稍候....')
+                path=painter(lst_img[0].url)
+                await bot.send(event,Image(path=path))
+                # print(lst_img[0].url)
+            else:
+                await bot.send(event,'请发送一张图片哦')
+                global zifuhua
+                global sendera
+                sendera=event.sender.id
+                zifuhua=1
+
+
+    @bot.on(GroupMessage)
+    async def charPic1(event: GroupMessage):
+        global zifuhua
+        global sendera
+        if zifuhua==1 :
+            if event.sender.id==sendera:
+                if event.message_chain.count(Image)==1:
+                    lst_img = event.message_chain.get(Image)
+                    print('已接收命令')
+                    await bot.send(event,'正在生成.....请稍候....')
+                    path=painter(lst_img[0].url)
+                    await bot.send(event,Image(path=path))
+                    zifuhua=0
+                    # print(lst_img[0].url)
+                else:
+                    await bot.send(event,'请发送一张图片哦')
+                    zifuhua=1
 
     # smoke
     @bot.on(GroupMessage)
@@ -704,8 +783,8 @@ if __name__ == '__main__':
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain) == '添加语音':
-            global sender
-            sender = event.sender.id
+            global sendera
+            sendera = event.sender.id
             await bot.send(event, '请输入关键词')
             global status
             status = 1
@@ -714,24 +793,35 @@ if __name__ == '__main__':
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain) == '开始添加':
-            global sender
-            sender=event.sender.id
+            global sendera
+            sendera=event.sender.id
             await bot.send(event,'请输入关键词')
             global status
             status = 1
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         global status
+        baner=0
         if status==1:
-            if event.sender.id==sender:
+            if event.sender.id==sendera:
                 global key
                 if event.message_chain.count(Image) == 1:
                     lst_img = event.message_chain.get(Image)
-                    key = lst_img[0].url
+                    key = str(lst_img[0].url)
+                    print(key)
+                    await bot.send(event, '已记录关键词,请发送回复')
+                    status = 2
                 else:
-                    key=str(event.message_chain)
-                await bot.send(event, '已记录关键词,请发送回复')
-                status = 2
+                    ban = ['妈', '主人', '狗', '老公', '老婆', '爸', '奶', '爷', '党', '爹', 'b', '逼','牛','国','批']
+                    for i in ban:
+                        if i in event.message_chain:
+                            await bot.send(event, '似乎是不合适的词呢.....')
+                            baner = 1
+                            status = 0
+                    if baner != 1:
+                        key=str(event.message_chain)
+                        await bot.send(event, '已记录关键词,请发送回复')
+                        status = 2
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         global status
@@ -739,8 +829,8 @@ if __name__ == '__main__':
             global key
             global voiceMode
             baner=0
-            if event.sender.id == sender:
-                ban=['妈','主人','狗','老公','老婆','爸','奶','爷','党','爹','b','逼']
+            if event.sender.id == sendera:
+                ban=['妈','主人','狗','老公','老婆','爸','奶','爷','党','爹','b','逼','牛','国','批']
                 for i in ban:
                     if i in event.message_chain:
                         await bot.send(event,'似乎是不合适的词呢.....')
@@ -766,36 +856,109 @@ if __name__ == '__main__':
                     dict = addReplys(addStr)
                     status = 0
                     await bot.send(event, '已添加至词库')
-
-    # 自定义词库的废案
-    '''@bot.on(GroupMessage)
-    async def addReply(event: GroupMessage):
-        if str(event.message_chain).startswith('添加'):
-            print(event.message_chain)
-            if '#' in event.message_chain:
+    # 模糊匹配词库管理
+    @bot.on(GroupMessage)
+    async def handle_group_message(event: GroupMessage):
+        if str(event.message_chain) == '模糊语音':
+            global mohusendera
+            mohusendera = event.sender.id
+            await bot.send(event, '请输入关键词')
+            global mohustatus
+            mohustatus = 1
+            global mohuvoiceMode
+            mohuvoiceMode = 1
+    @bot.on(GroupMessage)
+    async def handle_group_message(event: GroupMessage):
+        if str(event.message_chain) == '模糊添加':
+            global mohusendera
+            mohusendera = event.sender.id
+            await bot.send(event, '请输入关键词')
+            global mohustatus
+            mohustatus = 1
+    @bot.on(GroupMessage)
+    async def handle_group_message(event: GroupMessage):
+        global mohustatus
+        baner = 0
+        if mohustatus == 1:
+            if event.sender.id == mohusendera:
+                global mohukey
                 if event.message_chain.count(Image) == 1:
                     lst_img = event.message_chain.get(Image)
-                    path = lst_img[0].url
-                    imgname=dict_download_img(path)
-                    aaa=str(event.message_chain).split('#')
-                    stra=aaa[0]+'#'+imgname
+                    mohukey = str(lst_img[0].url)
+                    print(mohukey)
+                    await bot.send(event, '已记录关键词,请发送回复')
+                    mohustatus = 2
                 else:
-                    stra=str(event.message_chain)
-                #更新全局变量：词库
-                global dict
-                dict=addReplys(stra)
-                await bot.send(event,'添加完成')
-            else:
-                ranpath = random_str()
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-                tex = '[JA]' + translate('你是笨蛋吗？') + '[JA]'
-                voiceGenerate(tex, out)
-                await bot.send(event, '格式似乎有问题呢.....添加格式：添加关键词#回复')
-                await bot.send(event, Voice(path=out))'''
+                    ban = ['妈', '主人', '狗', '老公', '老婆', '爸', '奶', '爷', '党', '爹', 'b', '逼', '牛', '国', '批']
+                    for i in ban:
+                        if i in event.message_chain:
+                            await bot.send(event, '似乎是不合适的词呢.....')
+                            baner = 1
+                            mohustatus = 0
+                    if baner != 1:
+                        mohukey = str(event.message_chain)
+                        await bot.send(event, '已记录关键词,请发送回复')
+                        mohustatus = 2
+    @bot.on(GroupMessage)
+    async def handle_group_message(event: GroupMessage):
+        global mohustatus
+        if mohustatus == 2:
+            global mohukey
+            global mohuvoiceMode
+            global mohusendera
+            baner = 0
+            if event.sender.id == mohusendera:
+                ban = ['妈', '主人', '狗', '老公', '老婆', '爸', '奶', '爷', '党', '爹', 'b', '逼', '牛', '国', '批']
+                for i in ban:
+                    if i in event.message_chain:
+                        await bot.send(event, '似乎是不合适的词呢.....')
+                        baner = 1
+                        mohukey = ''
+                        mohustatus = 0
+                if baner != 1:
+                    if mohuvoiceMode == 1:
+                        ranpath = random_str()
+                        path = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
+                        tex = '[JA]' + translate(str(event.message_chain)) + '[JA]'
+                        voiceGenerate(tex, path)
+                        value = ranpath + '.wav'
+                    elif event.message_chain.count(Image) == 1:
+                        lst_img = event.message_chain.get(Image)
+                        path = lst_img[0].url
+                        imgname = dict_download_img(path)
+                        value = imgname
+                    else:
+                        value = str(event.message_chain)
+                    global superDict
+                    addStr = '添加' + mohukey + '#' + value
+                    superDict = mohuaddReplys(addStr)
+                    mohustatus = 0
+                    await bot.send(event, '已添加至词库')
+
+
     # 触发自定义回复
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         global dict
+        if event.message_chain.count(Image) == 1:
+            lst_img = event.message_chain.get(Image)
+            dictkey = str(lst_img[0].url)
+            if dictkey in dict.keys():
+                try:
+                    replyMes=random.choice(dict.get(str(dictkey)))
+                except:
+                    return
+                try:
+                    if str(replyMes).endswith('.png'):
+                        await bot.send(event,Image(path='pictures\\dictPic\\'+replyMes))
+                    elif str(replyMes).endswith('.wav'):
+                        await bot.send(event, Voice(path='plugins\\voices\\' + replyMes))
+                    else:
+                        await bot.send(event,replyMes)
+                except:
+                    print('回复模块----->error')
+            else:
+                return
         if str(event.message_chain) in dict.keys():
             try:
                 replyMes=random.choice(dict.get(str(event.message_chain)))
@@ -812,8 +975,85 @@ if __name__ == '__main__':
                 print('回复模块----->error')
         else:
             return
-
-
+    #模糊词库
+    @bot.on(GroupMessage)
+    async def mohu(event: GroupMessage):
+        global mohuKeys
+        global superDict
+        if At(bot.qq) in event.message_chain:
+            for i in mohuKeys:
+                likeM=fuzz.partial_ratio(str(event.message_chain),i)
+                if likeM>50:
+                    try:
+                        replyMes=random.choice(superDict.get(i))
+                    except:
+                        return
+                    if str(replyMes).endswith('.png'):
+                        await bot.send(event, Image(path='pictures\\dictPic\\' + replyMes))
+                    elif str(replyMes).endswith('.wav'):
+                        await bot.send(event, Voice(path='plugins\\voices\\' + replyMes))
+                    else:
+                        txt = replyMes
+                        if '{name}' in replyMes:
+                            replyMes = txt.replace("{name}", str(event.sender.member_name))
+                        if '{segment}' in replyMes:
+                            replyMes = txt.replace("{segment}", ',')
+                        await bot.send(event, replyMes)
+                    return
+                else:
+                    continue
+        else:
+            whetherReply=random.randint(0,100)
+            if whetherReply>85:
+                for i in mohuKeys:
+                    likeM=fuzz.partial_ratio(str(event.message_chain),i)
+                    if likeM>80:
+                        try:
+                            replyMes=random.choice(superDict.get(i))
+                        except:
+                            return
+                        if str(replyMes).endswith('.png'):
+                            await bot.send(event, Image(path='pictures\\dictPic\\' + replyMes))
+                        elif str(replyMes).endswith('.wav'):
+                            await bot.send(event, Voice(path='plugins\\voices\\' + replyMes))
+                        else:
+                            txt = replyMes
+                            if '{name}' in replyMes:
+                                replyMes = txt.replace("{name}", str(event.sender.member_name))
+                            if '{segment}' in replyMes:
+                                replyMes = txt.replace("{segment}", ',')
+                            await bot.send(event, replyMes)
+                        return
+                    else:
+                        continue
+            else:
+                return
+    #私聊
+    @bot.on(FriendMessage)
+    async def mohu(event: FriendMessage):
+        global mohuKeys
+        global superDict
+        for i in mohuKeys:
+            likeM = fuzz.partial_ratio(str(event.message_chain), i)
+            if likeM > 80:
+                try:
+                    replyMes = random.choice(superDict.get(i))
+                except:
+                    return
+                if str(replyMes).endswith('.png'):
+                    await bot.send(event, Image(path='pictures\\dictPic\\' + replyMes))
+                elif str(replyMes).endswith('.wav'):
+                    await bot.send(event, Voice(path='plugins\\voices\\' + replyMes))
+                else:
+                    txt = replyMes
+                    if '{name}' in replyMes:
+                        replyMes = txt.replace("{name}", str(event.sender.get_name()))
+                    if '{segment}' in replyMes:
+                        replyMes = txt.replace("{segment}", ',')
+                    await bot.send(event, replyMes)
+                return
+            else:
+                continue
 
 
     # 删除关键字和回复
@@ -831,6 +1071,20 @@ if __name__ == '__main__':
                 global dict
                 dict = s
                 await bot.send(event, '已删除关键词：' + (str(event.message_chain)[2:]))
+            except:
+                pass
+        if str(event.message_chain).startswith('模糊删除'):
+            # 调用词库删除函数
+            try:
+                if event.message_chain.count(Image) == 1:
+                    lst_img = event.message_chain.get(Image)
+                    key = lst_img[0].url
+                else:
+                    key=str(event.message_chain)
+                s=mohudels(key)
+                global superDict
+                superDict = s
+                await bot.send(event, '已删除关键词：' + (str(event.message_chain)[4:]))
             except:
                 pass
     #删除回复value
@@ -878,72 +1132,6 @@ if __name__ == '__main__':
                     delete =0
                     await bot.send(event,'下标不合法')
 
-
-    # 制图
-    @bot.on(GroupMessage)
-    async def qinqins(event: GroupMessage):
-        if event.message_chain.count(At)==1 and ('kiss' in event.message_chain):
-            # 获取头像的url
-            img_url=get_user_image_url(event.message_chain.get(At)[0].target)
-            try:
-                paths = qinqin(img_url)
-                await bot.send(event, Image(path=paths))
-            except:
-                print('error')
-
-        elif event.message_chain.count(Image)==1 and ('kiss' in event.message_chain):
-            lst_img = event.message_chain.get(Image)
-            img_url = lst_img[0].url
-            try:
-                paths = qinqin(img_url)
-                await bot.send(event, Image(path=paths))
-            except:
-                print('error')
-
-
-    # 老婆
-    @bot.on(GroupMessage)
-    async def qinqins(event: GroupMessage):
-        if event.message_chain.count(At) == 1 and ('mywife' in event.message_chain):
-            # 获取头像的url
-            img_url = get_user_image_url(event.message_chain.get(At)[0].target)
-            try:
-                paths = laopo(img_url)
-                await bot.send(event, Image(path=paths))
-            except:
-                print('error')
-
-        elif event.message_chain.count(Image) == 1 and ('mywife' in event.message_chain):
-            lst_img = event.message_chain.get(Image)
-            img_url = lst_img[0].url
-            try:
-                paths = laopo(img_url)
-                await bot.send(event, Image(path=paths))
-            except:
-                print('error')
-
-
-    # 结婚
-    @bot.on(GroupMessage)
-    async def qinqins(event: GroupMessage):
-        if event.message_chain.count(At) == 1 and ('marry' in event.message_chain):
-            # 获取头像的url
-            img_url = get_user_image_url(event.message_chain.get(At)[0].target)
-            try:
-                paths = jiehun(img_url)
-                await bot.send(event, Image(path=paths))
-            except:
-                print('error')
-
-        elif event.message_chain.count(Image) == 1 and ('marry' in event.message_chain):
-            lst_img = event.message_chain.get(Image)
-            img_url = lst_img[0].url
-            try:
-                paths = jiehun(img_url)
-                await bot.send(event, Image(path=paths))
-            except:
-                print('error')
-
-    # biliMonitor.main(bot)
-    # signPlugin.main(bot)
+    imgMakerRun.main(bot)#制图功能
+    tarot.main(bot)#塔罗牌功能
     bot.run()
