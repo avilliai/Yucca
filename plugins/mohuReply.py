@@ -7,6 +7,7 @@ import json
 
 #可以优化，bot.py中增加方式已经更新，但我懒得改
 import openpyxl
+from fuzzywuzzy import fuzz
 
 
 def mohuaddReplys(ass):
@@ -21,16 +22,27 @@ def mohuaddReplys(ass):
     #print('---------')
     file.close()
 
+    whetherAdd = 0
     #对传入的字符串进行处理并加入字典
     #如果已经有关键字
-    if (messageS[0] in dict):
-        replyValue=dict.get(messageS[0])
-        replyValue.append(messageS[1])
-        print('已有关键字，追加')
-        #print(replyValue)
-    #没有关键字则创建
+    for keyl in dict.keys():
+        likeM = fuzz.partial_ratio(messageS[0], keyl)
+        if (likeM>85):
+            replyValue = dict.get(keyl)
+            valuesss=replyValue.append(messageS[1])
+            dict[keyl]=valuesss
+            print('已有关键字，追加')
+            whetherAdd=1
+            break
+            # print(replyValue)
+        # 没有关键字则创建
+        else:
+            continue
+    if whetherAdd!=1:
+        dict[messageS[0]]=[messageS[1],]
+        print('创建了关键词')
     else:
-        dict[messageS[0]] = [messageS[1],]
+        pass
         #print(dict)
     #重新写入
 
@@ -71,11 +83,16 @@ def mohudels(messagess):
     js = file.read()
     dict = json.loads(js)
     messageS=messagess[4:]
-    try:
-        dict.pop(messageS)
-    except:
-        print('没有指定的关键词')
-        return 1
+    for keyl in dict.keys():
+        likeM = fuzz.partial_ratio(messageS, keyl)
+        if (likeM>90):
+            try:
+                dict.pop(keyl)
+                break
+            except:
+                print('没有指定的关键词')
+                return 1
+                break
     js = json.dumps(dict)
     file = open('Config/superDict.txt', 'w')
     file.write(js)
@@ -86,15 +103,21 @@ def mohudelValue(key,valueNo):
     file = open('Config/superDict.txt', 'r')
     js = file.read()
     dict = json.loads(js)
-    if key in dict.keys():
-        values=dict.get(key)
-        try:
-            value1=values.remove(valueNo)
-            dict[key]=value1
-        except:
+
+    for keyl in dict.keys():
+        likeM = fuzz.partial_ratio(key, keyl)
+        if (likeM>90):
+            values=dict.get(key)
+            try:
+                value1=values.remove(valueNo)
+                dict[key]=value1
+                break
+            except:
+                print('没有指定词')
+                break
+        else:
             print('没有指定词')
-    else:
-        print('没有指定词')
+            break
     js = json.dumps(dict)
     file = open('Config/superDict.txt', 'w')
     file.write(js)

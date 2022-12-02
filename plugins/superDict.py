@@ -6,7 +6,8 @@ from openpyxl import load_workbook
 
 
 def importDict():
-    xlsxPath = 'D:\Mirai\YirisVoiceGUI\PythonPlugins\Config\可爱系二次元bot词库1.5万词V1.1.xlsx'
+    #xlsxPath = 'D:\Mirai\YirisVoiceGUI\PythonPlugins\Config\可爱系二次元bot词库1.5万词V1.1.xlsx'
+    xlsxPath = 'D:\Mirai\YirisVoiceGUI\PythonPlugins\Config\词库.xlsx'
     # 第一步打开工作簿
     wb = openpyxl.load_workbook(xlsxPath)
     # 第二步选取表单
@@ -29,7 +30,9 @@ def importDict():
         all_row_dict.append(row_dict)
     for i in all_row_dict:
         key=i.get('问题')
-        value=i.get('回复(把{name}替换为ai对聊天对象的称呼，根据{segment}切分为多次发送的句子)')
+        #value=i.get('回复(把{name}替换为ai对聊天对象的称呼，根据{segment}切分为多次发送的句子)')
+        value = i.get('回复(把yucca替换成ai对自己的称呼，例如ai的名字(推荐)、我、咱等等，把name替换为ai对聊天对象的称呼，根据,切分为多次发送的句子)')
+
         if (key in newDict):
             replyValue=newDict.get(key)
             replyValue.append(value)

@@ -52,6 +52,7 @@ if __name__ == '__main__':
     print('已读取模糊匹配字典')
 
 
+
     severGroups=readConfig(r"Config\moyu\groups.txt")
     print('已读取服务群聊')
 
@@ -534,7 +535,7 @@ if __name__ == '__main__':
                 voiceGenerate(tex, out)
                 await bot.send(event, Voice(path=out))
     #语音转换
-    '''@bot.on(GroupMessage)
+    @bot.on(GroupMessage)
     async def voiceTan(event: GroupMessage):
         if str(event.message_chain)=='语音转换':
             global voiceSender
@@ -559,7 +560,7 @@ if __name__ == '__main__':
                     paths = voice_conversion("plugins/voices/sing/rest.wav")
                     await bot.send(event, Voice(path=paths))
                     voiceSender = 0
-                    voiceTrans = 0'''
+                    voiceTrans = 0
 
 
 
@@ -767,8 +768,12 @@ if __name__ == '__main__':
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain) == 'yucca唱歌':
-            index = random.randint(1, 22)
-            out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\sing\\'+str(index)+'.wav'
+            index = random.randint(1, 28)
+            if index>22:
+                index=23
+                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\sing\\' + str(index) + '.mp3'
+            else:
+                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\sing\\'+str(index)+'.wav'
             await bot.send(event, Voice(path=out))
     # la la run
     @bot.on(GroupMessage)
@@ -932,6 +937,8 @@ if __name__ == '__main__':
                     global superDict
                     addStr = '添加' + mohukey + '#' + value
                     superDict = mohuaddReplys(addStr)
+                    global mohuKeys
+                    mohuKeys=superDict.keys()
                     mohustatus = 0
                     await bot.send(event, '已添加至词库')
 
@@ -980,56 +987,57 @@ if __name__ == '__main__':
     async def mohu(event: GroupMessage):
         global mohuKeys
         global superDict
+        likeindex=99
         if At(bot.qq) in event.message_chain:
-            for i in mohuKeys:
-                likeM=fuzz.partial_ratio(str(event.message_chain),i)
-                if likeM>50:
-                    try:
-                        replyMes=random.choice(superDict.get(i))
-                    except:
+            #获取相似度排名
+            likeindex = 70
+            while likeindex>50:
+                for i in mohuKeys:
+                    #获取本次循环中消息和词库相似度，用相似度作为key
+                    likeM=fuzz.partial_ratio(str(event.message_chain),i)
+                    #如果大于本次循环设置阈值则发送消息
+                    if likeM>likeindex or likeM==likeindex:
+                        superRep=superDict.get(i)
+                        replyssssss=random.choice(superRep)
+                        if str(replyssssss).endswith('.png'):
+                            await bot.send(event, Image(path='pictures\\dictPic\\' + replyssssss))
+                        elif str(replyssssss).endswith('.wav'):
+                            await bot.send(event, Voice(path='plugins\\voices\\' + replyssssss))
+                        else:
+                            txt = replyssssss
+                            if 'name' in replyssssss:
+                                replyssssss = txt.replace("name", str(event.sender.member_name))
+                            await bot.send(event, replyssssss)
                         return
-                    if str(replyMes).endswith('.png'):
-                        await bot.send(event, Image(path='pictures\\dictPic\\' + replyMes))
-                    elif str(replyMes).endswith('.wav'):
-                        await bot.send(event, Voice(path='plugins\\voices\\' + replyMes))
-                    else:
-                        txt = replyMes
-                        if '{name}' in replyMes:
-                            replyMes = txt.replace("{name}", str(event.sender.member_name))
-                        if '{segment}' in replyMes:
-                            replyMes = txt.replace("{segment}", ',')
-                        await bot.send(event, replyMes)
-                    return
-                else:
-                    continue
+                #没有匹配的词
+                likeindex = likeindex - 1
+
+
         else:
             whetherReply=random.randint(0,100)
             if whetherReply>85:
-                for i in mohuKeys:
-                    likeM=fuzz.partial_ratio(str(event.message_chain),i)
-                    if likeM>80:
-                        try:
-                            replyMes=random.choice(superDict.get(i))
-                        except:
+                while likeindex > 70:
+                    for i in mohuKeys:
+                        # 获取本次循环中消息和词库相似度，用相似度作为key
+                        likeM = fuzz.partial_ratio(str(event.message_chain), i)
+                        # 如果大于本次循环设置阈值
+                        if likeM > likeindex or likeM == likeindex:
+                            superRep = superDict.get(i)
+                            replyssssss = random.choice(superRep)
+                            if str(replyssssss).endswith('.png'):
+                                await bot.send(event, Image(path='pictures\\dictPic\\' + replyssssss))
+                            elif str(replyssssss).endswith('.wav'):
+                                await bot.send(event, Voice(path='plugins\\voices\\' + replyssssss))
+                            else:
+                                txt = replyssssss
+                                if 'name' in replyssssss:
+                                    replyssssss = txt.replace("name", str(event.sender.member_name))
+                                await bot.send(event, replyssssss)
                             return
-                        if str(replyMes).endswith('.png'):
-                            await bot.send(event, Image(path='pictures\\dictPic\\' + replyMes))
-                        elif str(replyMes).endswith('.wav'):
-                            await bot.send(event, Voice(path='plugins\\voices\\' + replyMes))
-                        else:
-                            txt = replyMes
-                            if '{name}' in replyMes:
-                                replyMes = txt.replace("{name}", str(event.sender.member_name))
-                            if '{segment}' in replyMes:
-                                replyMes = txt.replace("{segment}", ',')
-                            await bot.send(event, replyMes)
-                        return
-                    else:
-                        continue
-            else:
-                return
+                    likeindex = likeindex - 1
+
     #私聊
-    @bot.on(FriendMessage)
+    ''''@bot.on(FriendMessage)
     async def mohu(event: FriendMessage):
         global mohuKeys
         global superDict
@@ -1053,7 +1061,7 @@ if __name__ == '__main__':
                     await bot.send(event, replyMes)
                 return
             else:
-                continue
+                continue'''
 
 
     # 删除关键字和回复
@@ -1085,6 +1093,8 @@ if __name__ == '__main__':
                 global superDict
                 superDict = s
                 await bot.send(event, '已删除关键词：' + (str(event.message_chain)[4:]))
+                global mohuKeys
+                mohuKeys=superDict.keys()
             except:
                 pass
     #删除回复value
