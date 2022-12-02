@@ -1010,7 +1010,7 @@ if __name__ == '__main__':
                             await bot.send(event, replyssssss)
                         return
                 #没有匹配的词
-                likeindex = likeindex - 1
+                likeindex = likeindex - 2
 
 
         else:
@@ -1034,7 +1034,7 @@ if __name__ == '__main__':
                                     replyssssss = txt.replace("name", str(event.sender.member_name))
                                 await bot.send(event, replyssssss)
                             return
-                    likeindex = likeindex - 1
+                    likeindex = likeindex - 3
 
     #私聊
     ''''@bot.on(FriendMessage)
