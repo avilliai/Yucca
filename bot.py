@@ -20,6 +20,7 @@ from plugins.Covid import getCovid
 from plugins.RandomStr.RandomStr import random_str
 from plugins.abstractMess import emoji, pinyin
 from plugins.charPicture import painter
+from plugins.chatGPT import GPT
 from plugins.cpGenerate import get_cp_mesg
 from plugins.dictPicDown import dict_download_img
 from plugins.easyReply import addReplys, dels, add
@@ -33,7 +34,7 @@ from plugins.peroDog import pero_dog_contents
 from plugins.picGet import pic
 from plugins.tarot import tarotChoice
 from readConfig import readConfig
-from run import mohuReply, tarot, imgMakerRun
+from run import mohuReply, tarot, imgMakerRun, everyDayDraw, daJiao, MiMo
 from trans import translate
 
 if __name__ == '__main__':
@@ -304,7 +305,7 @@ if __name__ == '__main__':
                 ranpath = random_str()
                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
                 tex = '[JA]' + translate('不准亲......快走开，变态！~') + '[JA]'
-                await bot.send(event,'不准亲，走开')
+                await bot.send(event,'这种要求的话....就这一次哦...')
                 await bot.send(event,Image(path=sys.argv[0][:-20] + 'PythonPlugins\\plugins\\PICTURE\\p2\\6.jpg'))
                 voiceGenerate(tex, out)
                 return bot.send(event, Voice(path=out))
@@ -771,7 +772,7 @@ if __name__ == '__main__':
     # yucca唱歌
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
-        if str(event.message_chain) == 'yucca唱歌':
+        if str(event.message_chain) == 'yucca唱歌' or ('唱歌' in str(event.message_chain)):
             index = random.randint(1, 28)
             if index>22:
                 index=23
@@ -1010,11 +1011,11 @@ if __name__ == '__main__':
         global mohuKeys
         global superDict
         global botName
-        likeindex = 99  # 初始匹配相似度
+        likeindex = 100  # 初始匹配相似度
         if At(bot.qq) in event.message_chain:
             getStr = str(event.message_chain).replace('@3377428814 ', '')
             # 获取相似度排名
-            likeindex = 70
+            #likeindex = 99
             while likeindex > 55:
                 for i in mohuKeys:
                     # 获取本次循环中消息和词库相似度，用相似度作为key
@@ -1027,6 +1028,8 @@ if __name__ == '__main__':
                             await bot.send(event, Image(path='pictures\\dictPic\\' + replyssssss))
                         elif str(replyssssss).endswith('.wav'):
                             await bot.send(event, Voice(path='plugins\\voices\\' + replyssssss))
+                        elif str(replyssssss).endswith('.gif'):
+                            await bot.send(event, Image(path='pictures\\dictPic\\' + replyssssss))
                         else:
                             if '{me}' in replyssssss:
                                 replyssssss = replyssssss.replace("{me}", botName)
@@ -1044,14 +1047,23 @@ if __name__ == '__main__':
                                 replyssssss = replyssssss.replace("{segment}", ',')
                             else:
                                 pass
-                            await bot.send(event, replyssssss)
+                            sas=random.randint(0,3)
+                            if sas==1:
+                                ranpath = random_str()
+                                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
+
+                                tex = '[JA]' + translate('查询新冠肺炎数据.......稍等哦~') + '[JA]'
+                                voiceGenerate(tex, out)
+                                await bot.send(event,Voice(path=out))
+                            else:
+                                await bot.send(event, replyssssss)
                         return
                 # 没有匹配的词
                 likeindex = likeindex - 2
         else:
             whetherReply = random.randint(0, 100)
             # 设置回复几率
-            if whetherReply > 86:
+            if whetherReply > 90:
                 # 最低相似度
                 while likeindex > 75:
                     for i in mohuKeys:
@@ -1065,24 +1077,38 @@ if __name__ == '__main__':
                                 await bot.send(event, Image(path='pictures\\dictPic\\' + replyssssss))
                             elif str(replyssssss).endswith('.wav'):
                                 await bot.send(event, Voice(path='plugins\\voices\\' + replyssssss))
+                            elif str(replyssssss).endswith('.gif'):
+                                await bot.send(event, Image(path='pictures\\dictPic\\' + replyssssss))
                             else:
-                                if '{me}' in replyssssss:
-                                    replyssssss = replyssssss.replace("{me}", botName)
+                                try:
+                                    if '{me}' in replyssssss:
+                                        replyssssss = replyssssss.replace("{me}", botName)
+                                    else:
+                                        pass
+                                    if 'name' in replyssssss:
+                                        replyssssss = replyssssss.replace("name", str(event.sender.member_name))
+                                    else:
+                                        pass
+                                    if '哥哥' in replyssssss:
+                                        replyssssss = replyssssss.replace("哥哥", str(event.sender.member_name))
+                                    else:
+                                        pass
+                                    if '{segment}' in replyssssss:
+                                        replyssssss = replyssssss.replace("{segment}", ',')
+                                    else:
+                                        pass
+                                except:
+                                    print('error')
+                                sas = random.randint(0, 3)
+                                if sas == 1:
+                                    ranpath = random_str()
+                                    out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
+
+                                    tex = '[JA]' + translate('查询新冠肺炎数据.......稍等哦~') + '[JA]'
+                                    voiceGenerate(tex, out)
+                                    await bot.send(event, Voice(path=out))
                                 else:
-                                    pass
-                                if 'name' in replyssssss:
-                                    replyssssss = replyssssss.replace("name", str(event.sender.member_name))
-                                else:
-                                    pass
-                                if '哥哥' in replyssssss:
-                                    replyssssss = replyssssss.replace("哥哥", str(event.sender.member_name))
-                                else:
-                                    pass
-                                if '{segment}' in replyssssss:
-                                    replyssssss = replyssssss.replace("{segment}", ',')
-                                else:
-                                    pass
-                                await bot.send(event, replyssssss)
+                                    await bot.send(event, replyssssss)
                             return
                     likeindex = likeindex - 3
 
@@ -1252,7 +1278,18 @@ if __name__ == '__main__':
                 except:
                     mohudelete = 0
                     await bot.send(event, '下标不合法')
+    @bot.on(GroupMessage)
+    async def gptGene(event: GroupMessage):
+        if str(event.message_chain).startswith('/'):
+            a=str(event.message_chain)[0:]
+            print('即将发送'+a)
+            backst=GPT(a)
+            print('返回了'+backst)
+            await bot.send(event,backst)
 
-    imgMakerRun.main(bot)#制图功能
+    #imgMakerRun.main(bot)#制图功能
+    MiMo.main(bot)
+    daJiao.main(bot)
     tarot.main(bot)#塔罗牌功能
+    everyDayDraw.main(bot)
     bot.run()

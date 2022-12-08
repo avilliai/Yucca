@@ -25,8 +25,8 @@ def qinqin(url):
     out.save(outfile)
     #发起超级融合
     st = Image.open(outfile)
-    st2 = Image.open("D:\Mirai\YirisVoiceGUI\PythonPlugins\plugins\PICTURE\\1.png")
-    st3 = Image.open("D:\Mirai\YirisVoiceGUI\PythonPlugins\plugins\PICTURE\\2.png")
+    st2 = Image.open("plugins\PICTURE\\1.png")
+    st3 = Image.open("plugins\PICTURE\\2.png")
     #merge = Image.blend(st, st2, 0.5)
     st.paste(st2)
     st.paste(st3,(0,460))
@@ -51,7 +51,7 @@ def laopo(url):
     out.save(outfile)
     #发起超级融合
     st2 = Image.open(outfile)
-    st = Image.open("D:\Mirai\YirisVoiceGUI\PythonPlugins\plugins\PICTURE\\3.jpg")
+    st = Image.open("plugins\PICTURE\\3.jpg")
     #merge = Image.blend(st, st2, 0.5)
     st.paste(st2,(110,91))
     s='pictures\\imgs.png'
@@ -72,7 +72,7 @@ def jiehun(url):
     out.save(outfile)
     #发起超级融合
     st = Image.open(outfile)
-    st2 = Image.open("D:\Mirai\YirisVoiceGUI\PythonPlugins\plugins\PICTURE\\jiehun.png")
+    st2 = Image.open("plugins\PICTURE\\jiehun.png")
 
     im = st
     mark = st2
@@ -101,7 +101,7 @@ def riyixia(url,str):
     out.save(outfile)
     #发起超级融合
     st = Image.open(outfile)
-    st2 = Image.open("D:\Mirai\YirisVoiceGUI\PythonPlugins\plugins\PICTURE\\5.png")
+    st2 = Image.open("plugins\PICTURE\\5.png")
 
     im = st2
     mark = st
@@ -142,7 +142,7 @@ def warn(url):
     out.save(outfile)
     #发起超级融合
     st = Image.open(outfile)
-    st2 = Image.open("D:\Mirai\YirisVoiceGUI\PythonPlugins\plugins\PICTURE\\s11.png")
+    st2 = Image.open("plugins\PICTURE\\s11.png")
 
     im = st2
     mark = st
@@ -152,7 +152,7 @@ def warn(url):
     out.save('pictures\\imgs.png')
 
     st = Image.open('pictures\\imgs.png')
-    st2 = Image.open("D:\Mirai\YirisVoiceGUI\PythonPlugins\plugins\PICTURE\\s11.png")
+    st2 = Image.open("plugins\PICTURE\\s11.png")
 
     im = st
     mark = st2
