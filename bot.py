@@ -27,6 +27,7 @@ from plugins.easyReply import addReplys, dels, add
 from plugins.gitZen import get_zen
 from plugins.imgMaker import qinqin, get_user_image_url, laopo, jiehun, riyixia, warn
 from plugins.jokeMaker import get_joke
+from plugins.keepChating import run_conversation
 from plugins.mohuReply import mohuaddReplys, mohudels, mohuadd
 from plugins.moyu import moyu
 from plugins.newsEveryday import news
@@ -38,7 +39,7 @@ from run import mohuReply, tarot, imgMakerRun, everyDayDraw, daJiao, MiMo
 from trans import translate
 
 if __name__ == '__main__':
-    bot = Mirai(3552663628, adapter=WebSocketAdapter(
+    bot = Mirai(3093724179, adapter=WebSocketAdapter(
         verify_key='1234567890', host='localhost', port=23456
     ))
     file = open('Config\\dict.txt', 'r')
@@ -80,6 +81,12 @@ if __name__ == '__main__':
 
     voiceSender=0
     voiceTrans=0
+
+    # 这里是ChatGPT的回复区
+    chatSender = 0
+    chatMode = 0
+    elseMes = 0
+    chatWant = 0
     # 私聊内容
     '''@bot.on(FriendMessage)
     async def on_friend_message(event: FriendMessage):
@@ -1047,12 +1054,22 @@ if __name__ == '__main__':
                                 replyssssss = replyssssss.replace("{segment}", ',')
                             else:
                                 pass
-                            sas=random.randint(0,3)
-                            if sas==1:
+                            sas=random.randint(0,5)
+                            if sas==1 or sas==2:
                                 ranpath = random_str()
                                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-
-                                tex = '[JA]' + translate('查询新冠肺炎数据.......稍等哦~') + '[JA]'
+                                if sas==1:
+                                    if 'yucca' in replyssssss:
+                                        replyssssss = replyssssss.replace("yucca", '丝兰')
+                                    else:
+                                        pass
+                                    tex = '[JA]' + translate(replyssssss) + '[JA]'
+                                else:
+                                    if 'yucca' in replyssssss:
+                                        replyssssss = replyssssss.replace("yucca", '我')
+                                    else:
+                                        pass
+                                    tex = '[ZH]' + replyssssss + '[ZH]'
                                 voiceGenerate(tex, out)
                                 await bot.send(event,Voice(path=out))
                             else:
@@ -1100,11 +1117,21 @@ if __name__ == '__main__':
                                 except:
                                     print('error')
                                 sas = random.randint(0, 3)
-                                if sas == 1:
+                                if sas == 1 or sas == 2:
                                     ranpath = random_str()
                                     out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-
-                                    tex = '[JA]' + translate('查询新冠肺炎数据.......稍等哦~') + '[JA]'
+                                    if sas == 1:
+                                        if 'yucca' in replyssssss:
+                                            replyssssss = replyssssss.replace("yucca", '丝兰')
+                                        else:
+                                            pass
+                                        tex = '[JA]' + translate(replyssssss) + '[JA]'
+                                    else:
+                                        if 'yucca' in replyssssss:
+                                            replyssssss = replyssssss.replace("yucca", '我')
+                                        else:
+                                            pass
+                                        tex = '[ZH]' + replyssssss + '[ZH]'
                                     voiceGenerate(tex, out)
                                     await bot.send(event, Voice(path=out))
                                 else:
@@ -1280,12 +1307,126 @@ if __name__ == '__main__':
                     await bot.send(event, '下标不合法')
     @bot.on(GroupMessage)
     async def gptGene(event: GroupMessage):
-        if str(event.message_chain).startswith('/'):
-            a=str(event.message_chain)[0:]
-            print('即将发送'+a)
-            backst=GPT(a)
-            print('返回了'+backst)
-            await bot.send(event,backst)
+        if str(event.message_chain).startswith('/g') or str(event.message_chain).startswith('chat'):
+            if str(event.message_chain).startswith('/gt'):
+                a = str(event.message_chain)[3:]
+                print('即将发送' + a)
+                backst = GPT(a,0)
+                print('已返回')
+                if len(backst)>500:
+                    asf=cut(backst,500)
+                    for i in asf:
+                        await bot.send(event,i)
+                else:
+                    await bot.send(event,backst)
+            else:
+                if str(event.message_chain).startswith('chat'):
+                    a=str(event.message_chain)[4:]
+                else:
+                    a=str(event.message_chain)[2:]
+                print('即将发送'+a)
+                backst=GPT(a)
+                print('已返回')
+
+                await bot.send(event,Image(path=backst))
+
+
+    def cut(obj, sec):
+        return [obj[i:i + sec] for i in range(0, len(obj), sec)]
+
+
+    @bot.on(GroupMessage)
+    async def chatgpta(event: GroupMessage):
+        global chatMode
+        global chatWant
+        global userDict
+        if str(event.message_chain).startswith('开始聊天'):
+            if chatMode != 0:
+                chatWant += 1
+                await bot.send(event, '稍等哦，我正在为别人解决问题....')
+
+            else:
+                global chatSender
+                chatSender = event.sender.id
+                await bot.send(event, '好的....' + event.sender.member_name + '想问什么呢...')
+                chatMode = 1
+                if event.sender.id not in userDict.keys():
+                    userDict[event.sender.id] = []
+
+
+    @bot.on(GroupMessage)
+    async def chatgpta(event: GroupMessage):
+        global chatMode
+        global chatSender
+        global elseMes
+        global userDict
+        global chatWant
+        if event.sender.id == chatSender:
+            if chatMode == 1:
+                if 'stop' in str(event.message_chain):
+                    chatMode = 0
+                    chatSender = 0
+                    elseMes = 0
+                    chatWant = 0
+                    await bot.send(event, '本次对话记录已保存，和' + event.sender.member_name + '聊天很开心...')
+                else:
+                    conversation = userDict.get(event.sender.id)
+                    print('已接收' + str(event.message_chain))
+                    conversation.append(str(event.message_chain))
+                    cona = "\n".join(conversation)
+                    reply = mains(cona)
+                    if len(reply) > 6:
+                        step = 5
+                        str1 = ''
+                        reply = [reply[i:i + step] for i in range(0, len(reply), step)]
+                        new = []
+                        for sa in reply:
+                            for saa in sa:
+                                str1 += (saa + '\n')
+                            new.append(str1)
+                        reply = new
+
+                    for i in reply:
+                        i = i.replace('Assistant', 'yucca')
+                        await bot.send(event, i)
+                    # reply=reply.replace('Assistant','yucca')
+                    # await bot.send(event,reply)
+                    userDict[event.sender.id] = conversation
+                    # await bot.send(event, reply[4:])
+                    elseMes += 1
+
+        else:
+            elseMes += 1
+
+
+    @bot.on(GroupMessage)
+    async def chatgpta(event: GroupMessage):
+        global chatMode
+        global chatSender
+        global elseMes
+        global chatWant
+        global userDict
+        if elseMes > 100 or chatWant > 1:
+            await bot.send(event, '已记录当前聊天数据')
+
+            chatMode = 0
+            chatSender = 0
+            elseMes = 0
+            chatWant = 0
+        if event.sender.id == chatSender and event.message_chain == 'stop':
+            await bot.send(event, '已记录本次聊天数据')
+
+            chatMode = 0
+            chatSender = 0
+            elseMes = 0
+            chatWant = 0
+            await bot.send(event, '那我.....先离开啦~')
+
+
+
+
+
+
 
     #imgMakerRun.main(bot)#制图功能
     MiMo.main(bot)
