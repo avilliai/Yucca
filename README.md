@@ -2,6 +2,8 @@ base on [YiriMirai](https://blog.csdn.net/weixin_45082972/article/details/114388
 
 mirai框架的简单功能包。使用了mirai-api-http
 
+教程都在release里面
+
 
 
 
