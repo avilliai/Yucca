@@ -39,7 +39,7 @@ from run import mohuReply, tarot, imgMakerRun, everyDayDraw, daJiao, MiMo
 from trans import translate
 
 if __name__ == '__main__':
-    bot = Mirai(3093724179, adapter=WebSocketAdapter(
+    bot = Mirai(3552663628, adapter=WebSocketAdapter(
         verify_key='1234567890', host='localhost', port=23456
     ))
     file = open('Config\\dict.txt', 'r')
@@ -1305,7 +1305,7 @@ if __name__ == '__main__':
                 except:
                     mohudelete = 0
                     await bot.send(event, '下标不合法')
-    @bot.on(GroupMessage)
+    ''''@bot.on(GroupMessage)
     async def gptGene(event: GroupMessage):
         if str(event.message_chain).startswith('/g') or str(event.message_chain).startswith('chat'):
             if str(event.message_chain).startswith('/gt'):
@@ -1420,7 +1420,7 @@ if __name__ == '__main__':
             chatSender = 0
             elseMes = 0
             chatWant = 0
-            await bot.send(event, '那我.....先离开啦~')
+            await bot.send(event, '那我.....先离开啦~')'''
 
 
 
