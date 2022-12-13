@@ -759,7 +759,7 @@ if __name__ == '__main__':
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain) == 'smoke':
-            index=random.randint(1,4)
+            index=random.randint(1,6)
             if index==0:
                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\La La Run！.mp3'
                 await bot.send(event, Voice(path=out))
@@ -769,11 +769,15 @@ if __name__ == '__main__':
             if index==2:
                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\i got smoke.mp3'
                 await bot.send(event, Voice(path=out))
-            if index==2:
+            if index==3:
                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\caudio.mp3'
                 await bot.send(event, Voice(path=out))
-            if index>3:
+            if index==4:
                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\XXX (Feat.V在燃烧).mp3'
+                await bot.send(event, Voice(path=out))
+            else:
+
+                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\Nayanion.mp3'
                 await bot.send(event, Voice(path=out))
 
     # yucca唱歌
