@@ -47,6 +47,7 @@ def importDict():
     file = open('Config\superDict.txt', 'w')
     file.write(js)
     file.close()
+
 def formExist():
     file = open('Config\\dict.txt', 'r')
     js = file.read()

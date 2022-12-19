@@ -13,6 +13,8 @@ from mirai import Mirai, WebSocketAdapter, FriendMessage, GroupMessage, At, Plai
 from mirai import Startup, Shutdown
 from mirai.models import BotJoinGroupEvent, MemberCardChangeEvent
 from graiax import silkcoder
+from mirai.models.events import NudgeEvent
+
 from MoeGoe import voiceGenerate, voice_conversion
 # from plugins import biliMonitor, signPlugin
 from plugins import manager
@@ -35,7 +37,7 @@ from plugins.peroDog import pero_dog_contents
 from plugins.picGet import pic
 from plugins.tarot import tarotChoice
 from readConfig import readConfig
-from run import mohuReply, tarot, imgMakerRun, everyDayDraw, daJiao, MiMo
+from run import mohuReply, tarot, imgMakerRun, everyDayDraw, daJiao, MiMo, nodgeReply
 from trans import translate
 
 if __name__ == '__main__':
@@ -53,14 +55,17 @@ if __name__ == '__main__':
     mohuKeys=superDict.keys()
     print('已读取模糊匹配字典')
 
-
+    file = open('Config\\userNamea.txt', 'r')
+    js = file.read()
+    nameSet = json.loads(js)
+    print('已读取用户信息')
 
     severGroups=readConfig(r"Config\moyu\groups.txt")
     print('已读取服务群聊')
 
     botName = 'yucca'
     # 过滤词库
-    ban = ['妈', '主人', '狗', '老公', '老婆', '爸', '奶', '爷', '党', '爹', 'b', '逼', '牛', '国', '批']
+    ban = ['妈', '主人', '狗', '公', '婆', '爸', '奶', '爷', '党', '爹', 'b', '逼', '牛', '国', '批','男','爸']
 
     key=''
     value=''
@@ -87,6 +92,8 @@ if __name__ == '__main__':
     chatMode = 0
     elseMes = 0
     chatWant = 0
+
+
     # 私聊内容
     '''@bot.on(FriendMessage)
     async def on_friend_message(event: FriendMessage):
@@ -1022,12 +1029,13 @@ if __name__ == '__main__':
         global mohuKeys
         global superDict
         global botName
+        global user
         likeindex = 100  # 初始匹配相似度
         if At(bot.qq) in event.message_chain:
             getStr = str(event.message_chain).replace('@3377428814 ', '')
             # 获取相似度排名
             #likeindex = 99
-            while likeindex > 55:
+            while likeindex > 45:
                 for i in mohuKeys:
                     # 获取本次循环中消息和词库相似度，用相似度作为key
                     likeM = fuzz.partial_ratio(getStr, i)
@@ -1047,11 +1055,24 @@ if __name__ == '__main__':
                             else:
                                 pass
                             if 'name' in replyssssss:
-                                replyssssss = replyssssss.replace("name", str(event.sender.member_name))
+                                if str(event.sender.id) in nameSet.keys():
+                                    replyssssss = replyssssss.replace("name", nameSet.get(str(event.sender.id)))
+                                else:
+                                    replyssssss = replyssssss.replace("name", str(event.sender.member_name))
                             else:
                                 pass
                             if '哥哥' in replyssssss:
-                                replyssssss = replyssssss.replace("哥哥", str(event.sender.member_name))
+                                if str(event.sender.id) in nameSet.keys():
+                                    replyssssss = replyssssss.replace("哥哥", nameSet.get(str(event.sender.id)))
+                                else:
+                                    replyssssss = replyssssss.replace("哥哥", str(event.sender.member_name))
+                            else:
+                                pass
+                            if '您' in replyssssss:
+                                if str(event.sender.id) in nameSet.keys():
+                                    replyssssss = replyssssss.replace("您", nameSet.get(str(event.sender.id)))
+                                else:
+                                    replyssssss = replyssssss.replace("您", str(event.sender.member_name))
                             else:
                                 pass
                             if '{segment}' in replyssssss:
@@ -1080,7 +1101,7 @@ if __name__ == '__main__':
                                 await bot.send(event, replyssssss)
                         return
                 # 没有匹配的词
-                likeindex = likeindex - 2
+                likeindex = likeindex - 1
         else:
             whetherReply = random.randint(0, 100)
             # 设置回复几率
@@ -1107,11 +1128,24 @@ if __name__ == '__main__':
                                     else:
                                         pass
                                     if 'name' in replyssssss:
-                                        replyssssss = replyssssss.replace("name", str(event.sender.member_name))
+                                        if str(event.sender.id) in nameSet.keys():
+                                            replyssssss = replyssssss.replace("name", nameSet.get(str(event.sender.id)))
+                                        else:
+                                            replyssssss = replyssssss.replace("name", str(event.sender.member_name))
                                     else:
                                         pass
                                     if '哥哥' in replyssssss:
-                                        replyssssss = replyssssss.replace("哥哥", str(event.sender.member_name))
+                                        if str(event.sender.id) in nameSet.keys():
+                                            replyssssss = replyssssss.replace("哥哥", nameSet.get(str(event.sender.id)))
+                                        else:
+                                            replyssssss = replyssssss.replace("哥哥", str(event.sender.member_name))
+                                    else:
+                                        pass
+                                    if '您' in replyssssss:
+                                        if str(event.sender.id) in nameSet.keys():
+                                            replyssssss = replyssssss.replace("您", nameSet.get(str(event.sender.id)))
+                                        else:
+                                            replyssssss = replyssssss.replace("您", str(event.sender.member_name))
                                     else:
                                         pass
                                     if '{segment}' in replyssssss:
@@ -1141,11 +1175,11 @@ if __name__ == '__main__':
                                 else:
                                     await bot.send(event, replyssssss)
                             return
-                    likeindex = likeindex - 3
+                    likeindex = likeindex - 1
 
 
     # 取消注释开放私聊
-    '''@bot.on(FriendMessage)
+    @bot.on(FriendMessage)
     async def mohu(event: FriendMessage):
         global mohuKeys
         global superDict
@@ -1184,7 +1218,7 @@ if __name__ == '__main__':
                         await bot.send(event, replyssssss)
                     return
             # 没有匹配的词
-            likeindex = likeindex - 2'''
+            likeindex = likeindex - 1
 
     # 删除关键字和回复
     @bot.on(GroupMessage)
@@ -1352,6 +1386,7 @@ if __name__ == '__main__':
             else:
                 global chatSender
                 chatSender = event.sender.id
+                
                 await bot.send(event, '好的....' + event.sender.member_name + '想问什么呢...')
                 chatMode = 1
                 if event.sender.id not in userDict.keys():
@@ -1425,6 +1460,29 @@ if __name__ == '__main__':
             elseMes = 0
             chatWant = 0
             await bot.send(event, '那我.....先离开啦~')'''
+    @bot.on(GroupMessage)
+    async def setName(event: GroupMessage):
+        global nameSet
+        if str(event.message_chain).startswith('callMe'):
+            name=str(event.message_chain)[6:]
+            nameSet[str(event.sender.id)]=name
+            ok=1
+            for i in ban:
+                if i in name:
+                    await bot.send(event, '这样的称呼似乎不太合适呢....')
+                    ok=0
+                    break
+            if name=='yucca':
+                await bot.send(event,'可是这好像是我的名字....')
+            if ok==1:
+                await bot.send(event,'好的，接下来我会用'+name+'来称呼您.....')
+            js = json.dumps(nameSet)
+            file = open('Config\\userNamea.txt', 'w')
+            file.write(js)
+            file.close()
+
+
+
 
 
 
