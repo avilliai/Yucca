@@ -3,6 +3,7 @@ base on [YiriMirai](https://blog.csdn.net/weixin_45082972/article/details/114388
 mirai框架的简单功能包。使用了mirai-api-http
 
 教程都在release里面
+![help](https://user-images.githubusercontent.com/99066610/208609071-5dca1eb5-04ed-4a1b-82a9-f14e183dc41b.png)
 
 
 
