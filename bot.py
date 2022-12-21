@@ -669,9 +669,9 @@ if __name__ == '__main__':
     # 菜单
     @bot.on(GroupMessage)
     async def help(event: GroupMessage):
-        if '帮助' in event.message_chain:
+        if '帮助' in str(event.message_chain) or '菜单' in str(event.message_chain):
             await bot.send(event,Image(path='Config\\help.png'))
-            await bot.send(event,'这是yucca的功能列表\nヾ(≧▽≦*)o')
+            await bot.send(event,'这是'+botName+'的功能列表\nヾ(≧▽≦*)o')
 
 
     # 抽象话
@@ -791,7 +791,7 @@ if __name__ == '__main__':
     # yucca唱歌
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
-        if str(event.message_chain) == 'yucca唱歌' or ('唱歌' in str(event.message_chain)):
+        if ('唱歌' in str(event.message_chain)):
             index = random.randint(1, 28)
             if index>22:
                 index=23
@@ -1085,16 +1085,13 @@ if __name__ == '__main__':
                                 ranpath = random_str()
                                 out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
                                 if sas==1:
-                                    if 'yucca' in replyssssss:
-                                        replyssssss = replyssssss.replace("yucca", '丝兰')
+                                    if botName in replyssssss:
+                                        replyssssss = replyssssss.replace(botName, '我')
                                     else:
                                         pass
                                     tex = '[JA]' + translate(replyssssss) + '[JA]'
                                 else:
-                                    if 'yucca' in replyssssss:
-                                        replyssssss = replyssssss.replace("yucca", '我')
-                                    else:
-                                        pass
+
                                     tex = '[ZH]' + replyssssss + '[ZH]'
                                 voiceGenerate(tex, out)
                                 await bot.send(event,Voice(path=out))
@@ -1106,7 +1103,7 @@ if __name__ == '__main__':
         else:
             whetherReply = random.randint(0, 100)
             # 设置回复几率
-            if whetherReply > 90:
+            if whetherReply > 900:
                 # 最低相似度
                 while likeindex > 75:
                     for i in mohuKeys:
@@ -1160,16 +1157,12 @@ if __name__ == '__main__':
                                     ranpath = random_str()
                                     out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
                                     if sas == 1:
-                                        if 'yucca' in replyssssss:
-                                            replyssssss = replyssssss.replace("yucca", '丝兰')
+                                        if botName in replyssssss:
+                                            replyssssss = replyssssss.replace(botName, '我')
                                         else:
                                             pass
                                         tex = '[JA]' + translate(replyssssss) + '[JA]'
                                     else:
-                                        if 'yucca' in replyssssss:
-                                            replyssssss = replyssssss.replace("yucca", '我')
-                                        else:
-                                            pass
                                         tex = '[ZH]' + replyssssss + '[ZH]'
                                     voiceGenerate(tex, out)
                                     await bot.send(event, Voice(path=out))
@@ -1473,7 +1466,7 @@ if __name__ == '__main__':
                     await bot.send(event, '这样的称呼似乎不太合适呢....')
                     ok=0
                     break
-            if name=='yucca':
+            if name==botName:
                 await bot.send(event,'可是这好像是我的名字....')
             if ok==1:
                 await bot.send(event,'好的，接下来我会用'+name+'来称呼您.....')
@@ -1484,8 +1477,9 @@ if __name__ == '__main__':
     @bot.on(GroupMessage)
     async def cloudmusicComm(event: GroupMessage):
         if '到点了' in  str(event.message_chain) or ('网易云' in str(event.message_chain)):
-            com=getCom()
-            await bot.send(event,com)
+            time.sleep(3)
+            cosfm=getCom()
+            await bot.send(event,str(cosfm))
 
 
 
