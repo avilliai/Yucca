@@ -23,6 +23,7 @@ from plugins.RandomStr.RandomStr import random_str
 from plugins.abstractMess import emoji, pinyin
 from plugins.charPicture import painter
 from plugins.chatGPT import GPT
+from plugins.cloudMusicCom import getCom
 from plugins.cpGenerate import get_cp_mesg
 from plugins.dictPicDown import dict_download_img
 from plugins.easyReply import addReplys, dels, add
@@ -1480,6 +1481,11 @@ if __name__ == '__main__':
             file = open('Config\\userNamea.txt', 'w')
             file.write(js)
             file.close()
+    @bot.on(GroupMessage)
+    async def cloudmusicComm(event: GroupMessage):
+        if '到点了' in  str(event.message_chain) or ('网易云' in str(event.message_chain)):
+            com=getCom()
+            await bot.send(event,com)
 
 
 
