@@ -1,11 +1,15 @@
 import requests
-tocken=''
+tocken='Imiewqr8fMpApy3kqEJh'
 def getCom():
-    url = "https://v2.alapi.cn/api/comment/submit"
+    import requests
 
-    payload = "token="+tocken+"&id=1413812846&type=playlist"
+    url = "https://v2.alapi.cn/api/comment"
+
+    payload = "token="+tocken+"&id="
     headers = {'Content-Type': "application/x-www-form-urlencoded"}
 
     response = requests.request("POST", url, data=payload, headers=headers)
 
-    return response.text
+    print(response.text)
+if __name__ == '__main__':
+    getCom()
