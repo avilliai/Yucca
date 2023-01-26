@@ -27,7 +27,7 @@ from trans import translate
 def main(bot):
     time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(time + '| jokeMaker module loaded successfully 已加载--- 笑话生成 ---模块')
-    print(time + '| cp文生成 module loaded successfully 已加载--- cp生成 ---模块')
+    print(time + '| cpCreate module loaded successfully 已加载--- cp生成 ---模块')
     print(time + '| githubZen module loaded successfully 已加载--- github禅语 ---模块')
     print(time + '| peroDog module loaded successfully 已加载--- 舔狗日记 ---模块')
     print(time + '| abstract module loaded successfully 已加载--- 抽象话 ---模块')

@@ -31,18 +31,18 @@ if __name__ == '__main__':
 
 
 
-    #imgMakerRun.main(bot)#制图功能
-    MiMo.main(bot)#随机人设
-    daJiao.main(bot)#打搅功能
-    tarot.main(bot)#塔罗牌功能
-    everyDayDraw.main(bot)#每日抽卡
-    blueArchive.main(bot)#碧蓝档案相关
-    musicInside.main(bot)#内置音频库
-    charPic.main(bot)#字符画
-    replyInside.main(bot)#部分内置回复
-    scheduledTasks.main(bot)#定时任务
-    extra.main(bot)#杂七杂八功能
-    voicePart.main(bot)#语音生成（主动）
-    wReply.main(bot)#自定义回复
+    # imgMakerRun.main(bot)# 制图功能
+    MiMo.main(bot)# 随机人设
+    daJiao.main(bot)# 打搅功能
+    tarot.main(bot)# 塔罗牌功能
+    everyDayDraw.main(bot)# 每日抽卡
+    blueArchive.main(bot)# 碧蓝档案相关
+    musicInside.main(bot)# 内置音频库
+    charPic.main(bot)# 字符画
+    # replyInside.main(bot)# 部分内置回复,不要打开，会变得不幸
+    scheduledTasks.main(bot)# 定时任务
+    extra.main(bot)# 杂七杂八功能
+    voicePart.main(bot)# 语音生成（主动）
+    wReply.main(bot)# 自定义回复
     startVer()
     bot.run()

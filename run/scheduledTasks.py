@@ -64,6 +64,8 @@ def main(bot):
         for i in severGroups:
             intTrans = int(i)
             index = random.randint(1, 5)
+            time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(time + '| 下班时间-----> ')
             if index == 1:
                 ranpath = random_str()
                 out ='plugins\\voices\\' + ranpath + '.wav'
@@ -94,6 +96,8 @@ def main(bot):
     async def timer():
         newsPic = news()
         global severGroups
+        time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(time + '| 新闻事件-----> ')
         for i in severGroups:
             intTrans = int(i)
             ranpath = random_str()
@@ -111,6 +115,8 @@ def main(bot):
     @scheduler.scheduled_job(CronTrigger(hour=12, minute=10))
     async def timer():
         global severGroups
+        time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(time + '| 禅语-----> ')
         for i in severGroups:
             intTrans = int(i)
             ranpath = random_str()
@@ -131,6 +137,8 @@ def main(bot):
         for i in severGroups:
             intTrans = int(i)
             index = random.randint(1, 4)
+            time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(time + '| 执行早八问候-----> ')
             if index == 1:
                 ranpath = random_str()
                 out = 'plugins\\voices\\' + ranpath + '.wav'

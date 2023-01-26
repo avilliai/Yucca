@@ -136,7 +136,7 @@ def voiceGenerate(tex,out,spealerIDDD=0):
 
             #print_speakers(speakers, escape)
             time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print(time + '| 正在使用语音模型：'+str(speakeriddd)+' ......生成中')
+            print(time + '| 正在使用语音模型：'+str(speakeriddd)+' ......生成中'+'  |  文本：'+tex)
             speaker_id = speakeriddd
 
             with no_grad():

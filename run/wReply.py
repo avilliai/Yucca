@@ -360,8 +360,8 @@ def main(bot):
                                     replyssssss = replyssssss.replace("{me}", botName)
                                 else:
                                     pass
-                                if '{name}' in replyssssss:
-                                    replyssssss = replyssssss.replace("{name}", str(event.sender.member_name))
+                                if 'name' in replyssssss:
+                                    replyssssss = replyssssss.replace("name", str(event.sender.member_name))
                                 else:
                                     pass
                                 if '哥哥' in replyssssss:
@@ -449,8 +449,8 @@ def main(bot):
                             replyssssss = replyssssss.replace("{me}", botName)
                         else:
                             pass
-                        if '{name}' in replyssssss:
-                            replyssssss = replyssssss.replace("{name}", str(event.sender.get_name()))
+                        if 'name' in replyssssss:
+                            replyssssss = replyssssss.replace("name", str(event.sender.get_name()))
                         else:
                             pass
                         if '哥哥' in replyssssss:
