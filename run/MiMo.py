@@ -8,6 +8,8 @@ import time
 from mirai import Image, Voice
 from mirai import Mirai, WebSocketAdapter, FriendMessage, GroupMessage, At, Plain
 def main(bot):
+    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time + '| Mimo module loaded successfully 已加载--- 随机人设 ---模块')
     meiMo = {
 
         "AI型号": [

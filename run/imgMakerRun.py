@@ -1,4 +1,4 @@
-
+import datetime
 
 from mirai import Image, Voice
 from mirai import Mirai, WebSocketAdapter, FriendMessage, GroupMessage, At, Plain
@@ -8,6 +8,8 @@ from plugins.imgMaker import qinqin, get_user_image_url, laopo, jiehun, riyixia,
 
 
 def main(bot):
+    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time + '| imgMaker module loaded successfully 已加载--- 制图 ---模块')
     # 制图
     @bot.on(GroupMessage)
     async def qinqins(event: GroupMessage):

@@ -10,6 +10,8 @@ from mirai import Mirai, WebSocketAdapter, FriendMessage, GroupMessage, At, Plai
 
 
 def main(bot):
+    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time + '| everyDayDraw module loaded successfully 已加载--- 每日运势 ---模块')
     smallDict = {'大吉': 'daji.jpg', '大凶': 'daxiong.jpg', '吉': 'ji.jpg', '小吉': 'xiaoji.jpg', '小凶': 'xiaoxiong.jpg','凶': 'xiong.jpg', '中吉': 'zhongji.jpg', '中凶': 'zhongxiong.jpg','吉 ': 'ji.jpg','大吉 ': 'daji.jpg','小吉 ':'xiaoji.jpg'}
     smallDictkeys = list(smallDict.keys())
 

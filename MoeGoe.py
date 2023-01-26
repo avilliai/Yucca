@@ -91,8 +91,8 @@ def voiceGenerate(tex,out,spealerIDDD=0):
 
     #model = 'voiceModel\\1374_epochs.pth'#input('Path of a VITS model: ')
     #config ='voiceModel\\config.json'#input('Path of a config file: ')
-    model = 'D:\Mirai\YirisVoiceGUI\PythonPlugins\GERalt\G.pth'
-    config = 'D:\Mirai\YirisVoiceGUI\PythonPlugins\GERalt\config.json'
+    model = 'voiceModel/1374_epochs.pth'
+    config = 'voiceModel/config.json'
 
     hps_ms = utils.get_hparams_from_file(config)
     n_speakers = hps_ms.data.n_speakers if 'n_speakers' in hps_ms.data.keys() else 0

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/Config/user.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Config/完全匹配.xlsx" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/config.json" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/plugins/Config/covid.json" charset="GBK" />
     <file url="file://$PROJECT_DIR$/revChatGPT" charset="UTF-8" />
