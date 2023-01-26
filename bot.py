@@ -4,7 +4,7 @@ import json
 import random
 import sys
 import time
-
+#from plugins.cloudMusicCom import getCom
 from fuzzywuzzy import fuzz,process
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -21,9 +21,11 @@ from plugins import manager
 from plugins.Covid import getCovid
 from plugins.RandomStr.RandomStr import random_str
 from plugins.abstractMess import emoji, pinyin
+from plugins.blueArchiveGacha import gacha
 from plugins.charPicture import painter
 from plugins.chatGPT import GPT
 from plugins.cloudMusicCom import getCom
+
 from plugins.cpGenerate import get_cp_mesg
 from plugins.dictPicDown import dict_download_img
 from plugins.easyReply import addReplys, dels, add
@@ -38,7 +40,7 @@ from plugins.peroDog import pero_dog_contents
 from plugins.picGet import pic
 from plugins.tarot import tarotChoice
 from readConfig import readConfig
-from run import mohuReply, tarot, imgMakerRun, everyDayDraw, daJiao, MiMo, nodgeReply
+from run import mohuReply, tarot, imgMakerRun, everyDayDraw, daJiao, MiMo, nodgeReply, blueArchive, musicInside
 from trans import translate
 
 if __name__ == '__main__':
@@ -763,52 +765,6 @@ if __name__ == '__main__':
                     await bot.send(event,'请发送一张图片哦')
                     zifuhua=1
 
-    # smoke
-    @bot.on(GroupMessage)
-    async def handle_group_message(event: GroupMessage):
-        if str(event.message_chain) == 'smoke':
-            index=random.randint(1,6)
-            if index==0:
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\La La Run！.mp3'
-                await bot.send(event, Voice(path=out))
-            if index==1:
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\smokeboy.mp3'
-                await bot.send(event, Voice(path=out))
-            if index==2:
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\i got smoke.mp3'
-                await bot.send(event, Voice(path=out))
-            if index==3:
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\caudio.mp3'
-                await bot.send(event, Voice(path=out))
-            if index==4:
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\XXX (Feat.V在燃烧).mp3'
-                await bot.send(event, Voice(path=out))
-            else:
-
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\Nayanion.mp3'
-                await bot.send(event, Voice(path=out))
-
-    # yucca唱歌
-    @bot.on(GroupMessage)
-    async def handle_group_message(event: GroupMessage):
-        if ('唱歌' in str(event.message_chain)):
-            index = random.randint(1, 28)
-            if index>22:
-                index=23
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\sing\\' + str(index) + '.mp3'
-            else:
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\sing\\'+str(index)+'.wav'
-            await bot.send(event, Voice(path=out))
-    # la la run
-    @bot.on(GroupMessage)
-    async def handle_group_message(event: GroupMessage):
-        if str(event.message_chain) == 'ba':
-            #index = random.randint(1, 4)
-            #if index == 0:
-                out = sys.argv[0][:-20] + 'PythonPlugins\\plugins\\voices\\La La Run！.mp3'
-                await bot.send(event, Voice(path=out))
-
-
 
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
@@ -1454,6 +1410,7 @@ if __name__ == '__main__':
             elseMes = 0
             chatWant = 0
             await bot.send(event, '那我.....先离开啦~')'''
+    # 设定称谓
     @bot.on(GroupMessage)
     async def setName(event: GroupMessage):
         global nameSet
@@ -1474,6 +1431,7 @@ if __name__ == '__main__':
             file = open('Config\\userNamea.txt', 'w')
             file.write(js)
             file.close()
+    # 网易云
     @bot.on(GroupMessage)
     async def cloudmusicComm(event: GroupMessage):
         if '到点了' in  str(event.message_chain) or ('网易云' in str(event.message_chain)):
@@ -1483,16 +1441,11 @@ if __name__ == '__main__':
 
 
 
-
-
-
-
-
-
-
     #imgMakerRun.main(bot)#制图功能
-    MiMo.main(bot)
-    daJiao.main(bot)
+    MiMo.main(bot)#随机人设
+    daJiao.main(bot)#打搅功能
     tarot.main(bot)#塔罗牌功能
-    everyDayDraw.main(bot)
+    everyDayDraw.main(bot)#每日抽卡
+    blueArchive.main(bot)#碧蓝档案相关
+    musicInside.main(bot)#内置音频库
     bot.run()

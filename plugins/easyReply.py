@@ -117,5 +117,6 @@ if __name__ == '__main__':
             print(addReplys(s))
         elif s.startswith('删除'):
             print(dels(s))'''
-    fromOut()
+    #fromOut()
+    pass
 

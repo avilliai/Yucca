@@ -89,8 +89,10 @@ def voiceGenerate(tex,out,spealerIDDD=0):
     else:
         escape = False
 
-    model = 'voiceModel\\1374_epochs.pth'#input('Path of a VITS model: ')
-    config ='voiceModel\\config.json'#input('Path of a config file: ')
+    #model = 'voiceModel\\1374_epochs.pth'#input('Path of a VITS model: ')
+    #config ='voiceModel\\config.json'#input('Path of a config file: ')
+    model = 'D:\Mirai\YirisVoiceGUI\PythonPlugins\GERalt\G.pth'
+    config = 'D:\Mirai\YirisVoiceGUI\PythonPlugins\GERalt\config.json'
 
     hps_ms = utils.get_hparams_from_file(config)
     n_speakers = hps_ms.data.n_speakers if 'n_speakers' in hps_ms.data.keys() else 0
@@ -201,7 +203,8 @@ def voice_conversion(sourcepath,speaker=0):
 
 
 if __name__ == '__main__':
-    voice_conversion("plugins/voices/sing/rest.wav")
+    #voice_conversion("plugins/voices/sing/rest.wav")
+    voiceGenerate('[EN]hi I am Geralt ,wahere are you from?[EN]','D:\Mirai\YirisVoiceGUI\PythonPlugins\GERalt\\1.wav','GERALTTRSIN')
     '''ranpath = random_str()
     Path=sys.argv[0][:-23]
     print(Path)
