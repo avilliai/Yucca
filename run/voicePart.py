@@ -25,6 +25,7 @@ def main(bot):
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain).startswith('中文'):
+
             modelList = ['0', '1', '2', '3']
             if len(str(event.message_chain)) < 60:
                 if '#' in str(event.message_chain):
@@ -40,12 +41,16 @@ def main(bot):
                     model = 0
                 ranpath = random_str()
                 out ='plugins\\voices\\' + ranpath + '.wav'
+                time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time + '| 中文语音生成-----> ' +tex)
                 voiceGenerate(tex, out, model)
                 await bot.send(event, Voice(path=out))
             else:
                 ranpath = random_str()
                 out ='plugins\\voices\\' + ranpath + '.wav'
                 tex = '[ZH]太常了哦......[ZH]'
+                time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time + '| 中文语音生成-----> ' + tex)
                 voiceGenerate(tex, out)
                 await bot.send(event, Voice(path=out))
 
@@ -68,12 +73,16 @@ def main(bot):
                     model = 0
                 ranpath = random_str()
                 out ='plugins\\voices\\' + ranpath + '.wav'
+                time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time + '| 日语语音生成-----> ' + tex)
                 voiceGenerate(tex, out, model)
                 await bot.send(event, Voice(path=out))
             else:
                 ranpath = random_str()
                 out = 'plugins\\voices\\' + ranpath + '.wav'
                 tex = '[JA]' + translate('不行,太长了哦.....') + '[JA]'
+                time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time + '| 日语语音生成-----> ' + tex)
                 voiceGenerate(tex, out)
                 await bot.send(event, Voice(path=out))
 

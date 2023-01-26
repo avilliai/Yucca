@@ -21,6 +21,13 @@ if __name__ == '__main__':
             await bot.send(event, '这是' + botName + '的功能列表\nヾ(≧▽≦*)o')
 
 
+    def startVer():
+        file_object = open("./mylog.log")
+        try:
+            all_the_text = file_object.read()
+        finally:
+            file_object.close()
+        print(all_the_text)
 
 
 
@@ -37,4 +44,5 @@ if __name__ == '__main__':
     extra.main(bot)#杂七杂八功能
     voicePart.main(bot)#语音生成（主动）
     wReply.main(bot)#自定义回复
+    startVer()
     bot.run()

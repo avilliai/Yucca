@@ -30,7 +30,8 @@ def main(bot):
     time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(time + '| scheduler module loaded successfully 已加载--- 定时任务 ---模块')
     severGroups = readConfig(r"Config\moyu\groups.txt")
-    print('已读取服务群聊')
+    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time + '| 已读取服务群聊')
     # 这里是定时任务区
     # 定时摸鱼,可以在Config//moyu//中添加群
     scheduler = AsyncIOScheduler()

@@ -27,7 +27,8 @@ def main(bot):
     js = file.read()
     global dict
     dict = json.loads(js)
-    print('已读取字典')
+    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time + '| 已读取字典')
 
     file = open('Config\\superDict.txt', 'r')
     jss = file.read()
@@ -35,16 +36,20 @@ def main(bot):
     superDict = json.loads(jss)
     global mohuKeys
     mohuKeys = superDict.keys()
-    print('已读取模糊匹配字典')
+    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time + '| 已读取模糊匹配字典')
     global trustUser
     trustUser = readConfig(r"Config\user.txt")
-    print('已读取信任用户')
+    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time + '| 已读取信任用户')
 
     file = open('Config\\userNamea.txt', 'r')
     js = file.read()
     global nameSet
     nameSet = json.loads(js)
-    print('已读取用户信息')
+    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time + '| 已读取用户信息')
+
 
     #修改为你bot的名字
     global botName
@@ -52,6 +57,10 @@ def main(bot):
     #你的QQ
     global master
     master=str(1840094972)
+
+    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time + '| ')
+
     #过滤词库
     global ban
     ban = ['妈', '主人', '狗', '老公', '老婆', '爸', '奶', '爷', '党', '爹', 'b', '逼', '牛', '国', '批']
@@ -163,6 +172,7 @@ def main(bot):
                         tex = '[JA]' + translate(str(event.message_chain)) + '[JA]'
                         voiceGenerate(tex, path)
                         value = ranpath + '.wav'
+                        voiceMode=0
                     elif event.message_chain.count(Image) == 1:
                         lst_img = event.message_chain.get(Image)
                         path = lst_img[0].url
@@ -171,6 +181,8 @@ def main(bot):
                     else:
                         value = str(event.message_chain)
                     global dict
+                    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    print(time + '| 完全匹配词库添加语音-----> ' + value)
                     addStr = '添加' + key + '#' + value
                     dict = addReplys(addStr)
                     status = 0
@@ -255,6 +267,7 @@ def main(bot):
                         tex = '[JA]' + translate(str(event.message_chain)) + '[JA]'
                         voiceGenerate(tex, path)
                         value = ranpath + '.wav'
+                        mohuvoiceMode=0
                     elif event.message_chain.count(Image) == 1:
                         lst_img = event.message_chain.get(Image)
                         path = lst_img[0].url
@@ -263,6 +276,8 @@ def main(bot):
                     else:
                         value = str(event.message_chain)
                     global superDict
+                    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    print(time + '| 模糊匹配词库添加语音----> ' + value)
                     addStr = '添加' + mohukey + '#' + value
                     superDict = mohuaddReplys(addStr)
                     global mohuKeys

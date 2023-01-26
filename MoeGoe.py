@@ -1,3 +1,5 @@
+import datetime
+
 from scipy.io.wavfile import write
 
 from plugins.RandomStr.RandomStr import random_str
@@ -133,7 +135,8 @@ def voiceGenerate(tex,out,spealerIDDD=0):
             stn_tst = get_text(text, hps_ms, cleaned=cleaned)
 
             #print_speakers(speakers, escape)
-            print('正在使用语音模型：'+str(speakeriddd)+' ......生成中')
+            time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(time + '| 正在使用语音模型：'+str(speakeriddd)+' ......生成中')
             speaker_id = speakeriddd
 
             with no_grad():
@@ -148,7 +151,8 @@ def voiceGenerate(tex,out,spealerIDDD=0):
             audio, out_path = voice_conversion()
 
         write(out_path, hps_ms.data.sampling_rate, audio)
-        print('Successfully saved!')
+        time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(time + '| Successfully saved!')
         break
 
 def voice_conversion(sourcepath,speaker=0):
