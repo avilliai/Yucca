@@ -13,7 +13,7 @@ def japanese_cleaners2(text):
 
 
 def korean_cleaners(text):
-    '''Pipeline for Korean text'''
+    #Pipeline for Korean text
     from text.korean import latin_to_hangul, number_to_hangul, divide_hangul
     text = latin_to_hangul(text)
     text = number_to_hangul(text)
@@ -23,7 +23,7 @@ def korean_cleaners(text):
 
 
 def chinese_cleaners(text):
-    '''Pipeline for Chinese text'''
+    #Pipeline for Chinese text
     from text.mandarin import number_to_chinese, chinese_to_bopomofo, latin_to_bopomofo
     text = number_to_chinese(text)
     text = chinese_to_bopomofo(text)

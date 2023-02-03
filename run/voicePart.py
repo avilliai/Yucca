@@ -21,11 +21,14 @@ def main(bot):
     voiceSender = 0
     global voiceTrans
     voiceTrans = 0
+    global modelSelect
+    modelSelect=0
+    global yuukaSaid
+    yuukaSaid=0
 
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain).startswith('中文'):
-
             modelList = ['0', '1', '2', '3']
             if len(str(event.message_chain)) < 60:
                 if '#' in str(event.message_chain):
@@ -58,6 +61,7 @@ def main(bot):
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain).startswith('说'):
+            global modelSelect
             modelList = ['0', '1', '2', '3']
             if len(str(event.message_chain)) < 70:
                 if '#' in str(event.message_chain):
@@ -75,7 +79,13 @@ def main(bot):
                 out ='plugins\\voices\\' + ranpath + '.wav'
                 time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 print(time + '| 日语语音生成-----> ' + tex)
-                voiceGenerate(tex, out, model)
+                if modelSelect==1:
+                    tex=tex.replace('[JA]','')
+                else:
+                    pass
+                voiceGenerate(tex, out, model,modelSelect)
+
+                modelSelect = 0
                 await bot.send(event, Voice(path=out))
             else:
                 ranpath = random_str()
@@ -83,8 +93,41 @@ def main(bot):
                 tex = '[JA]' + translate('不行,太长了哦.....') + '[JA]'
                 time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 print(time + '| 日语语音生成-----> ' + tex)
-                voiceGenerate(tex, out)
+                if modelSelect==1:
+                    tex=tex.replace('[JA]','')
+                    yuukaSaid+=1
+                else:
+                    pass
+                voiceGenerate(tex, out,0,modelSelect)
+                if yuukaSaid==3:
+                    modelSelect = 0
+                else:
+                    pass
                 await bot.send(event, Voice(path=out))
+    @bot.on(GroupMessage)
+    async def yuukaVoiceModelSelecter(event: GroupMessage):
+        if str(event.message_chain)=='modelSet=1':
+            global modelSelect
+            modelSelect=1
+            await bot.send(event,'已切换至ユウカ（优香）语音模型\n接下来三次语音生成任务默认使用优香语音模型')
+
+    @bot.on(GroupMessage)
+    async def yuukaVoiceModelSelecter(event: GroupMessage):
+        if str(event.message_chain).startswith('优香说'):
+            tex=str(event.message_chain)[3:]
+            tex=translate(tex)
+            ranpath = random_str()
+            out = 'plugins\\voices\\' + ranpath + '.wav'
+            voiceGenerate(tex, out, 0, 1)
+            await bot.send(event, Voice(path=out))
+
+        if str(event.message_chain).startswith('邮箱说'):
+            tex=str(event.message_chain)[3:]
+            ranpath = random_str()
+            out = 'plugins\\voices\\' + ranpath + '.wav'
+            voiceGenerate(tex, out, 0, 1)
+            await bot.send(event, Voice(path=out))
+
 
     # 语音转换
     '''@bot.on(GroupMessage)

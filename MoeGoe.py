@@ -81,7 +81,7 @@ def get_label(text, label):
     else:
         return False, text
 
-def voiceGenerate(tex,out,spealerIDDD=0):
+def voiceGenerate(tex,out,spealerIDDD=0,modelSelect=0):
     Path = sys.argv[0][:-23]
     text=tex
     out_path=out
@@ -93,8 +93,13 @@ def voiceGenerate(tex,out,spealerIDDD=0):
 
     #model = 'voiceModel\\1374_epochs.pth'#input('Path of a VITS model: ')
     #config ='voiceModel\\config.json'#input('Path of a config file: ')
-    model = 'voiceModel/1374_epochs.pth'
-    config = 'voiceModel/config.json'
+    if modelSelect==1:
+        model = 'voiceModel/YUUKA/YUUKA.pth'
+        config = 'voiceModel/YUUKA/config.json'
+        speakeriddd=0
+    else:
+        model = 'voiceModel/1374_epochs.pth'
+        config = 'voiceModel/config.json'
 
     hps_ms = utils.get_hparams_from_file(config)
     n_speakers = hps_ms.data.n_speakers if 'n_speakers' in hps_ms.data.keys() else 0
@@ -208,12 +213,12 @@ def voice_conversion(sourcepath,speaker=0):
 
 if __name__ == '__main__':
     #voice_conversion("plugins/voices/sing/rest.wav")
-    voiceGenerate('[EN]hi I am Geralt ,wahere are you from?[EN]','D:\Mirai\YirisVoiceGUI\PythonPlugins\GERalt\\1.wav','GERALTTRSIN')
+    voiceGenerate('先生,ちょっとお時間..いただけますか?','voiceModel/YUUKA/1.wav',0,1)
     '''ranpath = random_str()
     Path=sys.argv[0][:-23]
     print(Path)
     out = Path+'PythonPlugins\\plugins\\voices\\' + ranpath + '.wav'
-    tex = '[JA]' + translate('你想说什么呢，我在听.....') + '[JA]'
+    tex = '[JA]' + translate('测试语音.....') + '[JA]'
     voiceGenerate(tex, out)'''
     '''if '--escape' in sys.argv:
         escape = True

@@ -1,9 +1,5 @@
-import requests
-
-# 请求地址
-url = "https://iw233.cn/api.php?sort=top"
-# 发送get请求
-r=requests.get(url)
-# 获取返回的json数据
-
-print(r.json())
+# -*- coding:utf-8 -*-
+import json
+config={"botName":" 填写机器人的名字","botQQ":" 填写机器人的QQ","master":" 填写你的QQ"}
+with open('config.json','w',encoding='utf-8') as fp:
+    configa=json.dump(config,fp,ensure_ascii=False)

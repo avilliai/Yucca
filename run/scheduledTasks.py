@@ -5,6 +5,8 @@ import datetime
 import random
 import time
 import sys
+from asyncio import sleep
+
 from fuzzywuzzy import fuzz,process
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -27,13 +29,15 @@ from trans import translate
 
 
 def main(bot):
-    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(time + '| scheduler module loaded successfully 已加载--- 定时任务 ---模块')
+    time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time1 + '| scheduler module loaded successfully 已加载--- 定时任务 ---模块')
+    global severGroups
     severGroups = readConfig(r"Config\moyu\groups.txt")
-    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(time + '| 已读取服务群聊')
+    time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time1 + '| 已读取服务群聊')
     # 这里是定时任务区
     # 定时摸鱼,可以在Config//moyu//中添加群
+    global scheduler
     scheduler = AsyncIOScheduler()
 
     @bot.on(Startup)
@@ -47,23 +51,24 @@ def main(bot):
         scheduler.shutdown(True)  # 结束定时器
 
     # 摸鱼人日历
-    @scheduler.scheduled_job(CronTrigger(hour=16, minute=50))
+    @scheduler.scheduled_job(CronTrigger(hour=16, minute=55))
     async def timer():
         moyuPic = moyu()
         for i in severGroups:
             intTrans = int(i)
-            time.sleep(5)
+            sleep(5)
             try:
                 await bot.send_group_message(intTrans, Image(path=moyuPic))
             except:
                 print('摸鱼日历发送出错')
 
-    @scheduler.scheduled_job(CronTrigger(hour=16, minute=49))
+    @scheduler.scheduled_job(CronTrigger(hour=16, minute=59))
     async def timer():
         global severGroups
         for i in severGroups:
             intTrans = int(i)
             index = random.randint(1, 5)
+            sleep(3)
             time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(time + '| 下班时间-----> ')
             if index == 1:

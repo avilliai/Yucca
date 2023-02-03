@@ -19,7 +19,7 @@ from plugins.superDict import importDict
 from trans import translate
 
 
-def main(bot):
+def main(bot,config):
     time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(time + '| wReply module loaded successfully 已加载--- 自定义词库 ---模块')
 
@@ -53,10 +53,10 @@ def main(bot):
 
     #修改为你bot的名字
     global botName
-    botName = 'yucca'
+    botName = config.get('botName')
     #你的QQ
     global master
-    master=str(1840094972)
+    master=int(config.get('master'))
 
     time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(time + '| ')
@@ -96,6 +96,9 @@ def main(bot):
     delsender = 0
     global mohudelsender
     mohudelsender = 0
+
+    global turnMess
+    turnMess=1
 
     #添加语音回复详见我的另一个帖子
     @bot.on(GroupMessage)
@@ -346,7 +349,7 @@ def main(bot):
                     likeM = fuzz.partial_ratio(getStr, i)
                     # 如果大于本次循环设置阈值则发送消息
                     if likeM > likeindex or likeM == likeindex:
-                        superRep = superDict.get(i)
+                        superRep = superDict.get(str(i))
                         replyssssss = random.choice(superRep)
                         if str(replyssssss).endswith('.png'):
                             await bot.send(event, Image(path='pictures\\dictPic\\' + replyssssss))
@@ -361,7 +364,11 @@ def main(bot):
                                 else:
                                     pass
                                 if 'name' in replyssssss:
-                                    replyssssss = replyssssss.replace("name", str(event.sender.member_name))
+                                    try:
+                                        replyssssss = replyssssss.replace("name", str(event.sender.member_name))
+                                        replyssssss = replyssssss.replace("{name}", str(event.sender.member_name))
+                                    except:
+                                        print('error,但不重要')
                                 else:
                                     pass
                                 if '哥哥' in replyssssss:
@@ -461,11 +468,40 @@ def main(bot):
                             replyssssss = replyssssss.replace("{segment}", ',')
                         else:
                             pass
-                        await bot.send(event, replyssssss)
+                        try:
+                            if event.sender.id!=master:
+                                time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                                print(time + '| 接收私聊消息,来自' + str(event.sender.get_name()) + ' | ' +str(event.sender.id)+'\n内容：' +event.message_chain)
+                            else:
+                                pass
+                            global turnMess
+                            if turnMess==1 and event.sender.id!=master:
+                                await bot.send_friend_message(master,time+'\n接收私聊消息\n来自：' + str(event.sender.get_name()) +  '\nQQ:' +str(event.sender.id)+'\n内容：' + event.message_chain+'\n用--> '+replyssssss+' <--回复了')
+                            else:
+                                pass
+                            await bot.send(event, replyssssss)
+                        except:
+                            time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                            print(time + '| error,来自wReply,出现本报错可忽略')
+
                     return
             # 没有匹配的词
             likeindex = likeindex - 1
 
+    @bot.on(FriendMessage)
+    async def banTurnMess(event: FriendMessage):
+        global turnMess
+        if str(event.sender.id)==str(master):
+            if str(event.message_chain)=='关闭转发':
+                await bot.send(event,'已关闭转发')
+                time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time + '| 已关闭转发')
+                turnMess=0
+            elif str(event.message_chain)=='开启转发':
+                time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time + '| 已开启转发')
+                await bot.send(event, '已开启转发')
+                turnMess=1
 
 
     # 删除关键字和回复
@@ -610,7 +646,7 @@ def main(bot):
     @bot.on(GroupMessage)
     async def addGroup(event: GroupMessage):
         if str(event.message_chain).startswith('授权#'):
-            if str(event.sender.id)==master:
+            if str(event.sender.id)==str(master):
                 s = str(event.message_chain).split('#')
                 with open('Config\\user.txt', 'a') as file:
                     file.write('\n' + s[1])
@@ -624,7 +660,7 @@ def main(bot):
     @bot.on(GroupMessage)
     async def addGroup(event: GroupMessage):
         if str(event.message_chain).startswith('取消授权#'):
-            if str(event.sender.id) == master:
+            if str(event.sender.id) == str(master):
                 for i in trustUser:
                     print(i)
                 s = str(event.message_chain).split('#')
