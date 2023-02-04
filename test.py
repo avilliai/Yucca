@@ -18,6 +18,7 @@ from PIL import Image
 import plugins
 from plugins import weatherQuery
 from plugins.blueArchiveGacha import gacha
+from plugins.picGet import pic
 from plugins.weatherQ import weatherQ
 
 
@@ -87,4 +88,4 @@ def picMaker():
         print('ok')
 
 if __name__ == '__main__':
-    picMaker()
+    pic()

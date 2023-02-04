@@ -5,6 +5,7 @@ import datetime
 import random
 import time
 import sys
+from asyncio import sleep
 
 from mirai import Image, Voice
 from mirai import Mirai, WebSocketAdapter, FriendMessage, GroupMessage, At, Plain
@@ -143,8 +144,12 @@ def main(bot):
     @bot.on(GroupMessage)
     async def cloudmusicComm(event: GroupMessage):
         if '到点了' in str(event.message_chain) or ('网易云' in str(event.message_chain)):
-            time.sleep(3)
-            cosfm = getCom()
+            try:
+                cosfm = getCom()
+            except:
+                time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time + '| error,此报错来自网易云emo文案，可忽略')
+
             await bot.send(event, str(cosfm))
 
     # 图片模块
@@ -154,7 +159,10 @@ def main(bot):
         if '/pic' in str(event.message_chain):
             picNum = int((str(event.message_chain))[4:])
             if picNum < 10 and picNum > -1:
+
                 for i in range(picNum):
+                    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    print(time + '| 获取壁纸')
                     a = pic()
                     await bot.send(event, Image(path=a))
             elif picNum == '':

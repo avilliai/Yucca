@@ -17,7 +17,7 @@ def getCom():
     #print(response.json())
     data=a.get("data")
     da=data.get('comment_content')+'\n          ---¡¶'+data.get("title")+'¡·\n              '+ data.get('published_date')
-    print(da)
+    #print(da)
     return da
 if __name__ == '__main__':
     getCom()
