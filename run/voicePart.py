@@ -270,9 +270,9 @@ def main(bot):
                     else:
                         speakerId= 0
                     if modelSelect[0].endswith('m.pth'):
-                        tex = '[JA]' + translate((textt[0])[1:]) + '[JA]'
+                        tex = '[JA]' + translate((textt[0])[2:]) + '[JA]'
                     else:
-                        tex=translate((textt[0])[1:])
+                        tex=translate((textt[0])[2:])
                 else:
                     if modelSelect[0].endswith('m.pth'):
                         tex = '[JA]' + translate(str(event.message_chain)[1:]) + '[JA]'
