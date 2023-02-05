@@ -103,7 +103,7 @@ def main(bot):
                 else:
                     await bot.send(event,'不要重复签到！笨蛋！')
             else:
-                await bot.send(event,'请完善用户信息,发送  注册#城市名 以完善您的城市信息\n例如  注册#蚌埠')
+                await bot.send(event,'请完善用户信息,发送  注册#城市名 以完善您的城市信息\n例如  注册#通辽·')
                 global newUser
                 newUser[str(event.sender.id)]=0
 
@@ -122,8 +122,8 @@ def main(bot):
                 weather = weatherQ(city)
                 await bot.send(event, '成功')
             except:
-                await bot.send(event,'error，默认执行 注册#北京 ,随后可发送 修改城市#城市名 进行地区修改')
-                city='北京'
+                await bot.send(event,'error，默认执行 注册#通辽· ,随后可发送 修改城市#城市名 进行地区修改')
+                city='通辽·'
                 weather = weatherQ(city)
             global userdict
             userdict[str(event.sender.id)] = {"city": city, "st": time, "sts": "1", "exp": "0",

@@ -85,21 +85,16 @@ def voiceGenerate(tex,out,spealerIDDD=0,modelSelect=0):
     Path = sys.argv[0][:-23]
     text=tex
     out_path=out
-    speakeriddd=spealerIDDD
+    speakeriddd=int(spealerIDDD)
     if '--escape' in sys.argv:
         escape = True
     else:
         escape = False
 
-    #model = 'voiceModel\\1374_epochs.pth'#input('Path of a VITS model: ')
+    #model = 'voiceModel\\1374_epochsm.pth'#input('Path of a VITS model: ')
     #config ='voiceModel\\config.json'#input('Path of a config file: ')
-    if modelSelect==1:
-        model = 'voiceModel/YUUKA/YUUKA.pth'
-        config = 'voiceModel/YUUKA/config.json'
-        speakeriddd=0
-    else:
-        model = 'voiceModel/1374_epochs.pth'
-        config = 'voiceModel/config.json'
+    model=modelSelect[0]
+    config=modelSelect[1]
 
     hps_ms = utils.get_hparams_from_file(config)
     n_speakers = hps_ms.data.n_speakers if 'n_speakers' in hps_ms.data.keys() else 0
@@ -140,6 +135,7 @@ def voiceGenerate(tex,out,spealerIDDD=0,modelSelect=0):
             stn_tst = get_text(text, hps_ms, cleaned=cleaned)
 
             #print_speakers(speakers, escape)
+
             time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(time + '| 正在使用语音模型：'+str(speakeriddd)+' ......生成中'+'  |  文本：'+tex)
             speaker_id = speakeriddd
@@ -160,13 +156,14 @@ def voiceGenerate(tex,out,spealerIDDD=0,modelSelect=0):
         print(time + '| Successfully saved!')
         break
 
+
 def voice_conversion(sourcepath,speaker=0):
     if '--escape' in sys.argv:
         escape = True
     else:
         escape = False
 
-    model = 'voiceModel\\1374_epochs.pth'#input('Path of a VITS model: ')
+    model = 'voiceModel\\1374_epochsm.pth'#input('Path of a VITS model: ')
     config ='voiceModel\\config.json'#input('Path of a config file: ')
 
     hps_ms = utils.get_hparams_from_file(config)
