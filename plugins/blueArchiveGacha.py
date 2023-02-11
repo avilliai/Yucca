@@ -6,7 +6,7 @@ import requests
 import re
 import os
 import requests
-from bs4 import BeautifulSoup
+
 import cv2
 from PIL.ImageDraw import ImageDraw
 from PIL import ImageFont

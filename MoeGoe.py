@@ -210,7 +210,7 @@ def voice_conversion(sourcepath,speaker=0):
 
 if __name__ == '__main__':
     #voice_conversion("plugins/voices/sing/rest.wav")
-    voiceGenerate('先生,ちょっとお時間..いただけますか?','voiceModel/YUUKA/1.wav',0,1)
+    voiceGenerate('先生,ちょっとお時間..いただけますか?','voiceModel/YUUKA/1.wav',0,['D:\Mirai\zx\yuuka\\aust\\G.pth','D:\Mirai\zx\yuuka\\aust\\config.json'])
     '''ranpath = random_str()
     Path=sys.argv[0][:-23]
     print(Path)

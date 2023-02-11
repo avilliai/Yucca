@@ -18,8 +18,17 @@ def main(bot,config):
     global userdict
     userdict = json.loads(js)
 
+
     global master
     master=int(config.get('master'))
+
+    @bot.on(GroupMessage)
+    async def checkkk(event: GroupMessage):
+        if str(event.message_chain)=='签到':
+            file = open('Config\\signDict.txt', 'r')
+            js = file.read()
+            global userdict
+            userdict = json.loads(js)
     @bot.on(BotInvitedJoinGroupRequestEvent)
     async def allowStranger(event: BotInvitedJoinGroupRequestEvent):
         time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

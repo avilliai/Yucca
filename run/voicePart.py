@@ -13,9 +13,7 @@ from MoeGoe import voiceGenerate
 from plugins.RandomStr.RandomStr import random_str
 from plugins.picGet import pic
 from trans import translate
-def main(bot):
-    global master
-    master=1840094972
+def main(bot,master):
     time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(time + '| voiceGenerate module loaded successfully 已加载--- 语音生成 ---模块')
     # 中文生成1
@@ -42,6 +40,10 @@ def main(bot):
     a = os.listdir('voiceModel')
     print(type(a))
     ind=0
+
+    global CHOISE
+    CHOISE={}
+
     for i in a:
         print(i)
 
@@ -55,6 +57,7 @@ def main(bot):
                     muspeakers = {}
                     for id, name in enumerate(speakers):
                         muspeakers[str(id)] = name
+                        CHOISE[name]=[str(id),['voiceModel/' + i + '/' + ass,'voiceModel/' + i + '/config.json']]
 
                     modelDll[str(ind)]=['voiceModel/' + i + '/' + ass,'voiceModel/' + i + '/config.json',muspeakers]
                     time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -66,6 +69,7 @@ def main(bot):
                     pass
         else:
             pass
+    print('------\n'+str(CHOISE))
 
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
@@ -156,24 +160,46 @@ def main(bot):
                 await bot.send(event, Voice(path=out))
 
 
+    @bot.on(GroupMessage)
+    async def VoiceModelSelecter(event: GroupMessage):
+        if '说' in str(event.message_chain):
+            if str(event.message_chain).split('说')[0] in CHOISE.keys():
+                tex=str(event.message_chain).split('说')[1]
+                tex = translate(tex)
+                ranpath = random_str()
+                out = 'plugins\\voices\\' + ranpath + '.wav'
+                speaksdfaf=int(CHOISE.get(str(event.message_chain).split('说')[0])[0])
+                model=CHOISE.get(str(event.message_chain).split('说')[0])[1]
+                if model[0].endswith('m.pth'):
+                    tex='[JA]'+tex+'[JA]'
+                else:
+                    pass
+                voiceGenerate(tex, out, speaksdfaf, CHOISE.get(str(event.message_chain).split('说')[0])[1])
+                await bot.send(event, Voice(path=out))
 
     @bot.on(GroupMessage)
-    async def yuukaVoiceModelSelecter(event: GroupMessage):
-        if str(event.message_chain).startswith('优香说'):
-            tex=str(event.message_chain)[3:]
-            tex=translate(tex)
-            ranpath = random_str()
-            out = 'plugins\\voices\\' + ranpath + '.wav'
-            voiceGenerate(tex, out, 0, ['voiceModel/YUUKA/YUUKA.pth','voiceModel\YUUKA\config.json'])
-            await bot.send(event, Voice(path=out))
+    async def VoiceModelSelecter(event: GroupMessage):
+        if '中文' in str(event.message_chain):
+            if str(event.message_chain).split('中文')[0] in CHOISE.keys():
+                tex = str(event.message_chain).split('中文')[1]
+                ranpath = random_str()
+                out = 'plugins\\voices\\' + ranpath + '.wav'
+                speaksdfaf = int(CHOISE.get(str(event.message_chain).split('中文')[0])[0])
+                model = CHOISE.get(str(event.message_chain).split('中文')[0])[1]
+                if model[0].endswith('m.pth'):
+                    tex = '[ZH]' + tex + '[ZH]'
+                else:
+                    pass
+                voiceGenerate(tex, out, speaksdfaf, CHOISE.get(str(event.message_chain).split('中文')[0])[1])
+                await bot.send(event, Voice(path=out))
 
-        if str(event.message_chain).startswith('邮箱说'):
-            tex=str(event.message_chain)[3:]
-            ranpath = random_str()
-            out = 'plugins\\voices\\' + ranpath + '.wav'
-            voiceGenerate(tex, out, 0, ['voiceModel/YUUKA/YUUKA.pth','voiceModel\YUUKA\config.json'])
-            await bot.send(event, Voice(path=out))
-
+    @bot.on(GroupMessage)
+    async def VoiceModelSelecter(event: GroupMessage):
+        if str(event.message_chain)=='sp':
+            tex=''
+            for i in CHOISE.keys():
+                tex+=i+'|'
+            await bot.send(event,'可用角色如下\n'+tex)
 
     # 语音转换
     '''@bot.on(GroupMessage)
@@ -324,6 +350,20 @@ def main(bot):
     async def on_friend_message(event: FriendMessage):
         if str(event.message_chain).startswith('连接群'):
             if str(event.sender.id)==str(master):
+                sa = str(event.message_chain).split('#')
+                global aimGroup
+                aimGroup = int(sa[1])
+                global statusPath
+                statusPath = 1
+                await bot.send(event, '已切换为群聊' + sa[1])
+            else:
+                await bot.send(event, '您不是我的管理员哦')
+
+    # 连接群
+    @bot.on(GroupMessage)
+    async def on_friend_message(event: GroupMessage):
+        if str(event.message_chain).startswith('连接群'):
+            if str(event.sender.id) == str(master):
                 sa = str(event.message_chain).split('#')
                 global aimGroup
                 aimGroup = int(sa[1])

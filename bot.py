@@ -21,6 +21,7 @@ if __name__ == '__main__':
 
 
     botName = config.get('botName')
+    master=int(config.get('master'))
     # 菜单
     @bot.on(GroupMessage)
     async def help(event: GroupMessage):
@@ -61,7 +62,7 @@ if __name__ == '__main__':
     # replyInside.main(bot)# 部分内置回复,不要打开，会变得不幸
     scheduledTasks.main(bot)# 定时任务
     extra.main(bot)# 杂七杂八功能
-    voicePart.main(bot)# 语音生成（主动）
+    voicePart.main(bot,master)# 语音生成（主动）
     wReply.main(bot,config)# 自定义回复
     signAndDegree.main(bot)
     addManager1.main(bot,config)
