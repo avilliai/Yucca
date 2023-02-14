@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import datetime
 import json
 
 from mirai import Image, Voice
@@ -22,12 +23,39 @@ if __name__ == '__main__':
 
     botName = config.get('botName')
     master=int(config.get('master'))
+
+    def loadUser():
+        file = open('Config/moyu/groups.txt', 'r')
+        js = file.read()
+        severGroupsa = json.loads(js)
+        severGroups = severGroupsa.keys()
+
+        time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(time1 + '| 已读取服务群聊:'+str(len(severGroupsa))+'个')
+
+        file = open('Config\\signDict.txt', 'r')
+        js = file.read()
+        userdict = json.loads(js)
+        userCount=userdict.keys()
+        time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(time1 + '| 已读取有记录用户:' + str(len(userCount)) + '个')
+
+        # 修改为你bot的名字
+        botName = config.get('botName')
+        # 你的QQ
+        master = config.get('master')
+        time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(time1 + '| botName:'+botName+'     |     master:'+master)
+        time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(time1 + '| 功能已加载完毕，正在连接mirai-api-http(如出现WARNING可忽略)')
     # 菜单
     @bot.on(GroupMessage)
     async def help(event: GroupMessage):
         if '帮助' in str(event.message_chain) or '菜单' in str(event.message_chain):
             await bot.send(event, Image(path='Config\\help.png'))
             await bot.send(event, '这是' + botName + '的功能列表\nヾ(≧▽≦*)o')
+
+
 
 
 
@@ -67,4 +95,5 @@ if __name__ == '__main__':
     signAndDegree.main(bot)
     addManager1.main(bot,config)
     startVer()
+    loadUser()
     bot.run()

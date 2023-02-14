@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import random
 import sys
 
@@ -18,7 +19,7 @@ def mohuaddReplys(ass):
     file = open('Config/superDict.txt', 'r')
     js = file.read()
     dict = json.loads(js)
-    print('已读取字典')
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')+ '| 已读取字典')
     #print(dict)
     #print('---------')
     file.close()
@@ -28,7 +29,7 @@ def mohuaddReplys(ass):
     if (messageS[0] in dict):
         replyValue = dict.get(messageS[0])
         replyValue.append(messageS[1])
-        print('已有关键字，追加')
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')+ '| 已有关键字，追加')
         # print(replyValue)
     # 没有关键字则创建
     else:
@@ -55,7 +56,7 @@ def mohuadd(key,value):
     file = open('Config/superDict.txt', 'r')
     js = file.read()
     dict = json.loads(js)
-    print('已读取字典')
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')+ '| 已读取字典')
     #print(dict)
     #print('---------')
     file.close()
@@ -84,7 +85,7 @@ def mohudels(messagess):
     try:
         dict.pop(messageS)
     except:
-        print('没有指定的关键词')
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')+ '| 没有指定的关键词')
         return 1
 
     js = json.dumps(dict)
@@ -106,7 +107,7 @@ def mohudelValue(key,valueNo):
         except:
             print('error')
     else:
-        print('没有指定词')
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')+ '| 没有指定词')
     js = json.dumps(dict)
     file = open('Config/superDict.txt', 'w')
     file.write(js)

@@ -25,6 +25,6 @@ def main(bot):
             if True:
 
                 pic = gacha(10)
-                await bot.send(event, Image(path=pic))
+                await bot.send(event, Image(path=pic),True)
             else:
                 await bot.send(event, "数值不合法")

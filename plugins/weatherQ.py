@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 def weatherQ(city):
     import requests
-    from plyer import notification
 
     """
     plyer是用来显示弹窗的模块

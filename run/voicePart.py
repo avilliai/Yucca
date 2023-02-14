@@ -38,14 +38,14 @@ def main(bot,master):
     global modelDll
     modelDll={}
     a = os.listdir('voiceModel')
-    print(type(a))
+    #print(type(a))
     ind=0
 
     global CHOISE
     CHOISE={}
 
     for i in a:
-        print(i)
+        #print(i)
 
         if os.path.isdir('voiceModel/' + i):
             # 内层循环遍历取出模型文件
@@ -69,7 +69,7 @@ def main(bot,master):
                     pass
         else:
             pass
-    print('------\n'+str(CHOISE))
+    #print('------\n'+str(CHOISE))
 
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
@@ -165,13 +165,16 @@ def main(bot,master):
         if '说' in str(event.message_chain):
             if str(event.message_chain).split('说')[0] in CHOISE.keys():
                 tex=str(event.message_chain).split('说')[1]
-                tex = translate(tex)
+                try:
+                    tex = translate(tex)
+                except:
+                    tex=tex
                 ranpath = random_str()
                 out = 'plugins\\voices\\' + ranpath + '.wav'
                 speaksdfaf=int(CHOISE.get(str(event.message_chain).split('说')[0])[0])
                 model=CHOISE.get(str(event.message_chain).split('说')[0])[1]
                 if model[0].endswith('m.pth'):
-                    tex='[JA]'+tex+'[JA]'
+                    tex='[JA]'+str(tex)+'[JA]'
                 else:
                     pass
                 voiceGenerate(tex, out, speaksdfaf, CHOISE.get(str(event.message_chain).split('说')[0])[1])

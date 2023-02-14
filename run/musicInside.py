@@ -38,14 +38,24 @@ def main(bot):
     # yucca唱歌
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
-        if ('唱歌' in str(event.message_chain)):
-            index = random.randint(1, 28)
+        if ('唱歌' in str(event.message_chain)) or ('情人节' in str(event.message_chain)):
+            index = random.randint(1, 30)
             if index > 22:
-                index = 23
+                index = 24
                 out = 'plugins\\voices\\sing\\' + str(index) + '.mp3'
             else:
                 out ='plugins\\voices\\sing\\' + str(index) + '.wav'
-            await bot.send(event, Voice(path=out))
+
+            if ('情人节' in str(event.message_chain)):
+                if index>14:
+                    out = 'plugins/voices/sing/24.mp3'
+                    await bot.send(event, Voice(path=out))
+                    await bot.send(event, '正在播放:' + 'my heart is yours and yours alone-Moon Jelly')
+                    await bot.send(event, '今天是情人节哦......来听歌吧！')
+            else:
+                await bot.send(event, Voice(path=out))
+
+
 
     # la la run
     @bot.on(GroupMessage)

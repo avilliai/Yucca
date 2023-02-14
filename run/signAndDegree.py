@@ -59,8 +59,9 @@ def main(bot):
 
                     city = data.get('city')
                     startTime = data.get('st')
-
                     times = str(int(data.get('sts')) + 1)
+                    if times=='6':
+                        await bot.send(event,'词库自动授权完成,发送 开始添加 试试吧',True)
                     exp = str(int(data.get('exp')) + random.randint(1, 20))
                     nowTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     id = data.get('id')
@@ -99,11 +100,11 @@ def main(bot):
                     draw.text((1395, 1208), startTime, (12, 0, 6), font=font)
 
                     tp.save("pictures\\imgsa.png")
-                    await bot.send(event, Im(path="pictures\\imgsa.png"))
+                    await bot.send(event, Im(path="pictures\\imgsa.png"),True)
                 else:
-                    await bot.send(event,'不要重复签到！笨蛋！')
+                    await bot.send(event,'不要重复签到！笨蛋！',True)
             else:
-                await bot.send(event,'请完善用户信息,发送  注册#城市名 以完善您的城市信息\n例如  注册#通辽·')
+                await bot.send(event,'请完善用户信息,发送  注册#城市名 以完善您的城市信息\n例如  注册#通辽',True)
                 global newUser
                 newUser[str(event.sender.id)]=0
 
@@ -122,8 +123,8 @@ def main(bot):
                 weather = weatherQ(city)
                 await bot.send(event, '成功')
             except:
-                await bot.send(event,'error，默认执行 注册#通辽· ,随后可发送 修改城市#城市名 进行地区修改')
-                city='通辽·'
+                await bot.send(event,'error，默认执行 注册#通辽 ,随后可发送 修改城市#城市名 进行地区修改')
+                city='通辽'
                 weather = weatherQ(city)
             global userdict
             userdict[str(event.sender.id)] = {"city": city, "st": time, "sts": "1", "exp": "0",
@@ -150,7 +151,6 @@ def main(bot):
                 fp.write(newData)
 
 
-
             layer = Image.open('pictures/touxiang.png')
             name = random.randint(2, 298)
             bg = Image.open('pictures/backGround/' + str(name) + '.jpg')
@@ -173,7 +173,7 @@ def main(bot):
             draw.text((1395, 1208), startTime, (12, 0, 6), font=font)
 
             tp.save("pictures\\imgsa.png")
-            await bot.send(event,Im(path="pictures\\imgsa.png"))
+            await bot.send(event,Im(path="pictures\\imgsa.png"),True)
     @bot.on(GroupMessage)
     async def changeCity(event: GroupMessage):
         if str(event.message_chain).startswith('修改城市#'):
@@ -193,7 +193,7 @@ def main(bot):
                     fp.write(newData)
 
             except:
-                await bot.send(event,'没有对应的城市数据......，')
+                await bot.send(event,'没有对应的城市数据......，',True)
 
             data = userdict.get(str(event.sender.id))
 
@@ -235,7 +235,7 @@ def main(bot):
             draw.text((1395, 1208), startTime, (12, 0, 6), font=font)
 
             tp.save("pictures\\imgsa.png")
-            await bot.send(event, Im(path="pictures\\imgsa.png"))
+            await bot.send(event, Im(path="pictures\\imgsa.png"),True)
 
 
 

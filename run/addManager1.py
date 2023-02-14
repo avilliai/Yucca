@@ -4,10 +4,8 @@ import json
 
 from mirai import Image, Voice
 from mirai import Mirai, WebSocketAdapter, FriendMessage, GroupMessage, At, Plain
-from mirai.models.events import BotInvitedJoinGroupRequestEvent,NewFriendRequestEvent,MemberJoinRequestEvent,MemberHonorChangeEvent,MemberCardChangeEvent
+from mirai.models.events import BotInvitedJoinGroupRequestEvent,NewFriendRequestEvent,MemberJoinRequestEvent,MemberHonorChangeEvent,MemberCardChangeEvent,BotMuteEvent
 
-from run import MiMo, daJiao, tarot, everyDayDraw, blueArchive, musicInside, charPic, replyInside, scheduledTasks, \
-    extra, wReply, voicePart, signAndDegree
 def main(bot,config):
 
     time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -18,6 +16,10 @@ def main(bot,config):
     global userdict
     userdict = json.loads(js)
 
+    file = open('Config/blackList.txt', 'r')
+    js = file.read()
+    global blackList
+    blackList= json.loads(js)
 
     global master
     master=int(config.get('master'))
@@ -74,5 +76,28 @@ def main(bot,config):
         print(time + '| 群员昵称改变')
         await bot.send(event.group, event.origin + ' 的昵称改成了 ' + event.current+' \n警惕新型皮套诈骗')
 
+    @bot.on(BotMuteEvent)
+    async def BanAndBlackList(event: BotMuteEvent):
+        time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        global blackList
+        if str(event.operator.id) in blackList.keys():
+            timess=str(int(blackList.get(str(event.operator.id))[0])+1)
+            blackList[str(event.operator.id)]=[str(timess),str(event.operator.group.id)]
+            newData = json.dumps(blackList)
+            with open('Config\\blackList.txt', 'w') as fp:
+                fp.write(newData)
+        else:
+            timess=1
+            blackList[str(event.operator.id)]=[str(timess),str(event.operator.group.id)]
+            newData = json.dumps(blackList)
+            with open('Config\\blackList.txt', 'w') as fp:
+                fp.write(newData)
+
+        print(time + '| bot被禁言\n禁言时长：'+str(event.duration_seconds)+'秒\n群：'+str(event.operator.group)+'\n操作者：'+str(event.operator.id)+'\n成员名：'+str(event.operator.member_name))
+        await bot.send_friend_message(master,'bot在群:\n'+str(event.operator.group.name)+str(event.operator.group.id)+'\n被禁言'+str(event.duration_seconds)+'秒\n操作者id：'+str(event.operator.id)+'\nname:('+str(event.operator.member_name)+')\n不良记录：'+str(timess))
+        try:
+            await bot.send_temp_message(event.operator.id,'Bad records have been added')
+        except:
+            await bot.send_friend_message(event.operator.id,'Bad records have been added')
 
 

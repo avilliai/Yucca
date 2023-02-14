@@ -15,7 +15,7 @@ from plugins.dictPicDown import random_str, dict_download_img
 from plugins.easyReply import addReplys, dels, add
 from plugins.mohuReply import mohuaddReplys, mohudels, mohuadd
 from plugins.readConfig import readConfig
-from plugins.superDict import importDict
+from plugins.superDict import importDict, outPutDic
 from trans import translate
 
 
@@ -30,6 +30,7 @@ def main(bot,config):
     time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(time + '| 已读取字典')
 
+
     file = open('Config\\superDict.txt', 'r')
     jss = file.read()
     global superDict
@@ -38,10 +39,22 @@ def main(bot,config):
     mohuKeys = superDict.keys()
     time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(time + '| 已读取模糊匹配字典')
+
+
+    file = open('Config\\signDict.txt', 'r')
+    js = file.read()
     global trustUser
-    trustUser = readConfig(r"Config\user.txt")
+    global userdict
+    userdict = json.loads(js)
+    trustUser=[]
+    for i in userdict.keys():
+        data=userdict.get(i)
+        times = int(str(data.get('sts')))
+        if times>4:
+            trustUser.append(str(i))
+
     time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(time + '| 已读取信任用户')
+    print(time + '| 已读取信任用户'+str(len(trustUser))+'个')
 
     file = open('Config\\userNamea.txt', 'r')
     js = file.read()
@@ -58,8 +71,7 @@ def main(bot,config):
     global master
     master=int(config.get('master'))
 
-    time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(time + '| ')
+
 
     #过滤词库
     global ban
@@ -116,7 +128,7 @@ def main(bot,config):
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain) == '开始添加':
-            if str(event.sender.id) in trustUser or str(event.sender.id)==master:
+            if str(event.sender.id) in trustUser or str(event.sender.id)==str(master):
                 global sendera
                 sendera = event.sender.id
                 await bot.send(event, '请输入关键词')
@@ -170,12 +182,13 @@ def main(bot,config):
                 if baner != 1:
                     # 语音生成详见另一个帖子,配置成功后取消此行注释
                     if voiceMode == 1:
-                        ranpath = random_str()
+                        pass
+                        '''ranpath = random_str()
                         path ='plugins\\voices\\' + ranpath + '.wav'
                         tex = '[JA]' + translate(str(event.message_chain)) + '[JA]'
                         voiceGenerate(tex, path)
                         value = ranpath + '.wav'
-                        voiceMode=0
+                        voiceMode=0'''
                     elif event.message_chain.count(Image) == 1:
                         lst_img = event.message_chain.get(Image)
                         path = lst_img[0].url
@@ -185,18 +198,20 @@ def main(bot,config):
                         value = str(event.message_chain)
                     global dict
                     time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    print(time + '| 完全匹配词库添加语音-----> ' + value)
+                    print(time + '| 完全匹配词库添加回复-----> '+key+'---' + value)
                     addStr = '添加' + key + '#' + value
                     dict = addReplys(addStr)
                     status = 0
                     await bot.send(event, '已添加至词库')
+                    outPutDic(1)
+
 
 
     # 模糊匹配词库管理
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain) == '模糊语音':
-            if str(event.sender.id) in trustUser or str(event.sender.id)==master:
+            if str(event.sender.id) in trustUser or str(event.sender.id)==str(master):
                 global mohusendera
                 mohusendera = event.sender.id
                 await bot.send(event, '请输入关键词')
@@ -211,7 +226,7 @@ def main(bot,config):
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
         if str(event.message_chain) == '模糊添加':
-            if str(event.sender.id) in trustUser or str(event.sender.id)==master:
+            if str(event.sender.id) in trustUser or str(event.sender.id)==str(master):
                 global mohusendera
                 mohusendera = event.sender.id
                 await bot.send(event, '请输入关键词')
@@ -265,12 +280,13 @@ def main(bot,config):
                         mohustatus = 0
                 if baner != 1:
                     if mohuvoiceMode == 1:
-                        ranpath = random_str()
+                        pass
+                        '''ranpath = random_str()
                         path ='plugins\\voices\\' + ranpath + '.wav'
                         tex = '[JA]' + translate(str(event.message_chain)) + '[JA]'
                         voiceGenerate(tex, path)
                         value = ranpath + '.wav'
-                        mohuvoiceMode=0
+                        mohuvoiceMode=0'''
                     elif event.message_chain.count(Image) == 1:
                         lst_img = event.message_chain.get(Image)
                         path = lst_img[0].url
@@ -287,6 +303,7 @@ def main(bot,config):
                     mohuKeys = superDict.keys()
                     mohustatus = 0
                     await bot.send(event, '已添加至词库')
+                    outPutDic(2)
 
 
     # 完全匹配词库回复
@@ -339,7 +356,7 @@ def main(bot,config):
         global replypro
         likeindex = 100#初始匹配相似度
         if At(bot.qq) in event.message_chain:
-            getStr=str(event.message_chain).replace('@3377428814 ','')
+            getStr=str(event.message_chain).replace(str(bot.qq),'')
 
             # 获取相似度排名
             likeindex = 70
@@ -394,7 +411,7 @@ def main(bot,config):
                     for i in mohuKeys:
                         # 获取本次循环中消息和词库相似度，用相似度作为key
                         likeM = fuzz.partial_ratio(str(event.message_chain), i)
-                        # 如果大于本次循环设置阈值则输出，结束循环
+                        # 如果大于本次循环设置阈值则输出，结束循环1
                         if likeM > likeindex or likeM == likeindex:
                             superRep = superDict.get(i)
                             replyssssss = random.choice(superRep)
@@ -469,13 +486,13 @@ def main(bot,config):
                         else:
                             pass
                         try:
-                            if event.sender.id!=master:
+                            if event.sender.id!=str(master):
                                 time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                                 print(time + '| 接收私聊消息,来自' + str(event.sender.get_name()) + ' | ' +str(event.sender.id)+'\n内容：' +event.message_chain)
                             else:
                                 pass
                             global turnMess
-                            if turnMess==1 and event.sender.id!=master:
+                            if turnMess==1 and event.sender.id!=str(master):
                                 await bot.send_friend_message(master,time+'\n接收私聊消息\n来自：' + str(event.sender.get_name()) +  '\nQQ:' +str(event.sender.id)+'\n内容：' + event.message_chain+'\n用--> '+replyssssss+' <--回复了')
                             else:
                                 pass
@@ -520,6 +537,7 @@ def main(bot,config):
                     global dict
                     dict = s
                     await bot.send(event, '已删除关键词：' + (str(event.message_chain)[2:]))
+                    outPutDic(1)
                 except:
                     pass
             else:
@@ -539,6 +557,7 @@ def main(bot,config):
                     await bot.send(event, '已删除关键词：' + (str(event.message_chain)[4:]))
                     global mohuKeys
                     mohuKeys = superDict.keys()
+                    outPutDic(2)
                 except:
                     pass
             else:
@@ -592,6 +611,8 @@ def main(bot,config):
                 except:
                     delete = 0
                     await bot.send(event, '下标不合法')
+                outPutDic(1)
+                outPutDic(2)
 
     # 删除模糊回复value
     @bot.on(GroupMessage)
@@ -623,6 +644,7 @@ def main(bot,config):
             else:
                 await bot.send(event, event.sender.member_name + '似乎没有删除的权限呢...')
 
+
     # 删除指定下标执行部分
     @bot.on(GroupMessage)
     async def handle_group_message(event: GroupMessage):
@@ -641,18 +663,39 @@ def main(bot,config):
                 except:
                     mohudelete = 0
                     await bot.send(event, '下标不合法')
+                outPutDic(2)
 
     # 追加推送群聊
     @bot.on(GroupMessage)
     async def addGroup(event: GroupMessage):
         if str(event.message_chain).startswith('授权#'):
             if str(event.sender.id)==str(master):
-                s = str(event.message_chain).split('#')
-                with open('Config\\user.txt', 'a') as file:
-                    file.write('\n' + s[1])
-                await bot.send(event, '已更新受信任用户')
                 global trustUser
-                trustUser = readConfig(r"Config\user.txt")
+                global userdict
+                aimID = str(event.message_chain).split('#')[1]
+                if int(aimID) not in trustUser:
+
+
+                    if int(aimID) in userdict.keys():
+
+
+                        data = userdict.get(str(aimID))
+                        data['sts']='100'
+                        userdict[str(aimID)] =data
+                    else:
+                        time114514 = str(datetime.datetime.now().strftime('%Y-%m-%d'))
+                        userdict[str(aimID)] = {"city": "通辽", "st": time114514, "sts": "100", "exp": "0",
+                        "id": str(len(userdict.keys()) + 1), 'ok': time114514}
+
+                    trustUser.append(str(aimID))
+                    await bot.send(event, '授权成功')
+                    newData = json.dumps(userdict)
+                    with open('Config\\signDict.txt', 'w') as fp:
+                        fp.write(newData)
+
+                else:
+                    await bot.send(event,'已存在该用户',True)
+
             else:
                 await bot.send(event,event.sender.member_name+'不是'+botName+'的master哦')
 
@@ -661,36 +704,36 @@ def main(bot,config):
     async def addGroup(event: GroupMessage):
         if str(event.message_chain).startswith('取消授权#'):
             if str(event.sender.id) == str(master):
-                for i in trustUser:
-                    print(i)
-                s = str(event.message_chain).split('#')
-                if (s[1]+'\n') in trustUser:
-                    trustUser.remove(s[1]+'\n')
-                elif s[1] in trustUser:
-                    trustUser.remove(s[1])
-                elif ('\n'+s[1]) in trustUser:
-                    trustUser.remove('\n'+s[1])
+                global trustUser
+                aimID=str(event.message_chain).split('#')[1]
+                if str(aimID) in trustUser:
+
+                    trustUser.remove(str(aimID))
+                    global userdict
+
+                    data = userdict.get(str(aimID))
+                    data['sts']='0'
+                    userdict[str(aimID)] =data
+                    await bot.send(event,'已取消授权')
+
                 else:
-                    await bot.send(event,'该用户无授权记录')
-                await bot.send(event, '已更新受信任用户')
-                print('-----------')
-                for i in trustUser:
-                    print(i)
-                with open('Config\\user.txt', 'w') as file:
-                    for i in trustUser:
-                        file.write(i)
+                    await bot.send(event,'不存在该用户',True)
+                newData = json.dumps(userdict)
+                with open('Config\\signDict.txt', 'w') as fp:
+                    fp.write(newData)
             else:
                 await bot.send(event, event.sender.member_name + '不是' + botName + '的master哦')
     @bot.on(GroupMessage)
     async def restarts(event: GroupMessage):
-        if str(event.message_chain)=='更新词库' and str(event.sender.id)==master:
+        if str(event.message_chain)=='导入词库' and str(event.sender.id)==str(master):
             importDict(1)
             importDict(2)
             file = open('Config\\dict.txt', 'r')
             js = file.read()
             global dict
             dict = json.loads(js)
-            print('已读取字典')
+            time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(time + '| 已读取字典')
 
             file = open('Config\\superDict.txt', 'r')
             jss = file.read()
@@ -698,29 +741,38 @@ def main(bot,config):
             superDict = json.loads(jss)
             global mohuKeys
             mohuKeys = superDict.keys()
-            print('已读取模糊匹配字典')
-            await bot.send(event, '已更新')
+            time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(time + '| 已读取模糊匹配字典')
+            await bot.send(event, '已导入')
 
-        # 设定称谓
-        @bot.on(GroupMessage)
-        async def setName(event: GroupMessage):
-            global nameSet
-            if str(event.message_chain).startswith('callMe'):
-                name = str(event.message_chain)[6:]
-                nameSet[str(event.sender.id)] = name
-                ok = 1
-                for i in ban:
-                    if i in name:
-                        await bot.send(event, '这样的称呼似乎不太合适呢....')
-                        ok = 0
-                        break
-                if name == botName:
-                    await bot.send(event, '可是这好像是我的名字....')
-                if ok == 1:
-                    await bot.send(event, '好的，接下来我会用' + name + '来称呼您.....')
-                js = json.dumps(nameSet)
-                file = open('Config\\userNamea.txt', 'w')
-                file.write(js)
-                file.close()
+    # 设定称谓
+    @bot.on(GroupMessage)
+    async def setName(event: GroupMessage):
+        global nameSet
+        if str(event.message_chain).startswith('callMe'):
+            name = str(event.message_chain)[6:]
+            nameSet[str(event.sender.id)] = name
+            ok = 1
+            for i in ban:
+                if i in name:
+                    await bot.send(event, '这样的称呼似乎不太合适呢....')
+                    ok = 0
+                    break
+            if name == botName:
+                await bot.send(event, '可是这好像是我的名字....')
+            if ok == 1:
+                await bot.send(event, '好的，接下来我会用' + name + '来称呼您.....')
+            js = json.dumps(nameSet)
+            file = open('Config\\userNamea.txt', 'w')
+            file.write(js)
+            file.close()
+
+    @bot.on(GroupMessage)
+    async def restarts(event: GroupMessage):
+        if str(event.message_chain) == '导出词库' and str(event.sender.id) == str(master):
+            outPutDic(1)
+            outPutDic(2)
+            await bot.send(event, '已导出')
+
 
 

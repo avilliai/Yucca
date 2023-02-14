@@ -81,7 +81,7 @@ def get_label(text, label):
     else:
         return False, text
 
-def voiceGenerate(tex,out,spealerIDDD=0,modelSelect=0):
+def voiceGenerate(tex,out,spealerIDDD=0,modelSelect=['voiceModel/nene/1374_epochsm.pth','voiceModel/nene/config.json']):
     Path = sys.argv[0][:-23]
     text=tex
     out_path=out
@@ -137,7 +137,7 @@ def voiceGenerate(tex,out,spealerIDDD=0,modelSelect=0):
             #print_speakers(speakers, escape)
 
             time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print(time + '| 正在使用语音模型：'+str(speakeriddd)+' ......生成中'+'  |  文本：'+tex)
+            print(time + '| 正在使用语音模型：'+str(speakeriddd)+' ......生成中'+'  |  文本：'+str(tex))
             speaker_id = speakeriddd
 
             with no_grad():

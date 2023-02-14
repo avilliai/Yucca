@@ -14,7 +14,6 @@ from mirai import Image, Voice
 from mirai import Mirai, WebSocketAdapter, FriendMessage, GroupMessage, At, Plain
 from mirai import Startup, Shutdown
 from mirai.models import BotJoinGroupEvent, MemberCardChangeEvent
-from graiax import silkcoder
 from mirai.models.events import NudgeEvent
 from mirai import Image, Voice
 from mirai import Mirai, WebSocketAdapter, FriendMessage, GroupMessage, At, Plain
@@ -31,10 +30,18 @@ from trans import translate
 def main(bot):
     time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(time1 + '| scheduler module loaded successfully 已加载--- 定时任务 ---模块')
+
+    file = open('Config/moyu/groups.txt', 'r')
+    js = file.read()
     global severGroups
-    severGroups = readConfig(r"Config\moyu\groups.txt")
+    global severGroupsa
+    severGroupsa = json.loads(js)
+    severGroups = severGroupsa.keys()
+
     time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(time1 + '| 已读取服务群聊')
+    print(time1 + '| 定时任务服务群聊读取完毕')
+
+
     # 这里是定时任务区
     # 定时摸鱼,可以在Config//moyu//中添加群
     global scheduler
@@ -56,45 +63,59 @@ def main(bot):
         moyuPic = moyu()
         for i in severGroups:
             intTrans = int(i)
-            sleep(5)
+            await sleep(5)
             try:
                 await bot.send_group_message(intTrans, Image(path=moyuPic))
             except:
-                print('摸鱼日历发送出错')
+                time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time1 + '| 指定群' + str(intTrans) + '不存在或已退出')
 
-    @scheduler.scheduled_job(CronTrigger(hour=16, minute=59))
+    @scheduler.scheduled_job(CronTrigger(hour=13, minute=49))
+    async def timer():
+        for i in severGroups:
+            intTrans = int(i)
+            await sleep(4)
+            try:
+                out = 'plugins/voices/sing/24.mp3'
+                await bot.send_group_message(intTrans, Voice(path=out))
+
+                await bot.send_group_message(intTrans, '正在播放:' + 'my heart is yours and yours alone-Moon Jelly')
+            except:
+                time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time1 + '| 指定群' + str(intTrans) + '不存在或已退出')
+
+
+    @scheduler.scheduled_job(CronTrigger(hour=17, minute=50))
     async def timer():
         global severGroups
         for i in severGroups:
             intTrans = int(i)
             index = random.randint(1, 5)
-            sleep(3)
+            await sleep(3)
             time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(time + '| 下班时间-----> ')
             if index == 1:
                 ranpath = random_str()
                 out ='plugins\\voices\\' + ranpath + '.wav'
                 tex = '[JA]' + translate('啊......好累呢，该下班了') + '[JA]'
-                voiceGenerate(tex, out)
-                await bot.send_group_message(intTrans, Voice(path=out))
             if index == 2:
                 ranpath = random_str()
                 out = 'plugins\\voices\\' + ranpath + '.wav'
                 tex = '[JA]到下班时间了......晚上去哪里玩呢?...[JA]'
-                voiceGenerate(tex, out)
-                await bot.send_group_message(intTrans, Voice(path=out))
             if index == 3:
                 ranpath = random_str()
                 out ='plugins\\voices\\' + ranpath + '.wav'
                 tex = '[JA]' + translate('辛苦了，要注意休息哦。') + '[JA]'
-                voiceGenerate(tex, out)
-                await bot.send_group_message(intTrans, Voice(path=out))
             if index > 3:
                 ranpath = random_str()
                 out = 'plugins\\voices\\' + ranpath + '.wav'
                 tex = '[JA]' + translate('今天也好好努力过了......今天也很棒了') + '[JA]'
-                voiceGenerate(tex, out)
+            voiceGenerate(tex, out)
+            try:
                 await bot.send_group_message(intTrans, Voice(path=out))
+            except:
+                time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time1 + '| 指定群'+str(intTrans)+'不存在或已退出')
 
     # 早八新闻自动推送
     @scheduler.scheduled_job(CronTrigger(hour=7, minute=40))
@@ -111,17 +132,18 @@ def main(bot):
             voiceGenerate(tex, out)
             try:
                 await bot.send_group_message(intTrans, Image(path=newsPic))
-                time.sleep(5)
+                await sleep(2)
                 await bot.send_group_message(intTrans, Voice(path=out))
             except:
-                print('没有对应的群')
+                time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time1 + '| 指定群' + str(intTrans) + '不存在或已退出')
 
     # 中午推送github禅语
     @scheduler.scheduled_job(CronTrigger(hour=12, minute=10))
     async def timer():
         global severGroups
-        time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(time + '| 禅语-----> ')
+        time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(time1 + '| 禅语-----> ')
         for i in severGroups:
             intTrans = int(i)
             ranpath = random_str()
@@ -133,7 +155,8 @@ def main(bot):
                 await bot.send_group_message(intTrans, zen)
                 await bot.send_group_message(intTrans, Voice(path=out))
             except:
-                print('没有对应的群')
+                time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time1 + '| 指定群' + str(intTrans) + '不存在或已退出')
 
     # 早八问候
     @scheduler.scheduled_job(CronTrigger(hour=8, minute=1))
@@ -142,23 +165,48 @@ def main(bot):
         for i in severGroups:
             intTrans = int(i)
             index = random.randint(1, 4)
-            time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print(time + '| 执行早八问候-----> ')
+            time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(time1 + '| 执行早八问候-----> ')
             if index == 1:
                 ranpath = random_str()
                 out = 'plugins\\voices\\' + ranpath + '.wav'
                 tex = '[JA]' + translate('早上好......记得吃早饭~......今天也请好好加油~！') + '[JA]'
-                voiceGenerate(tex, out)
-                await bot.send_group_message(intTrans, Voice(path=out))
             if index == 2:
                 ranpath = random_str()
                 out = 'plugins\\voices\\' + ranpath + '.wav'
                 tex = '[JA]' + translate('唔......早上好呀!') + '[JA]'
-                voiceGenerate(tex, out)
-                await bot.send_group_message(intTrans, Voice(path=out))
             if index == 3:
                 ranpath = random_str()
                 out = 'plugins\\voices\\' + ranpath + '.wav'
                 tex = '[JA]' + translate('起床啦~!.......现在还没起床的话可不行') + '[JA]'
-                voiceGenerate(tex, out)
+            voiceGenerate(tex, out)
+            try:
                 await bot.send_group_message(intTrans, Voice(path=out))
+            except:
+                time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(time1 + '| 指定群' + str(intTrans) + '不存在或已退出')
+    # 追加推送群聊
+    @bot.on(GroupMessage)
+    async def addGroup(event: GroupMessage):
+        if str(event.message_chain).startswith('添加群#'):
+            global severGroupsa
+            global severGroups
+            s = str(event.message_chain).split('#')
+            severGroupsa[str(s[1])]=str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            severGroups=severGroupsa.keys()
+            newData = json.dumps(severGroupsa)
+            with open('Config/moyu/groups.txt', 'w') as fp:
+                fp.write(newData)
+
+    @bot.on(GroupMessage)
+    async def autoAdd(event: GroupMessage):
+        global severGroupsa
+        global severGroups
+        if str(event.group.id) not in severGroupsa.keys():
+            severGroupsa[str(event.group.id)]=str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            severGroups=severGroupsa.keys()
+            newData = json.dumps(severGroupsa)
+            time1=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(time1 + '| 新增群：'+str(event.group.id))
+            with open('Config/moyu/groups.txt', 'w') as fp:
+                fp.write(newData)

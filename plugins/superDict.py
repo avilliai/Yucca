@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import json
 
 import openpyxl
@@ -70,7 +71,62 @@ def importDict(mode):
     file.write(js)
     file.close()
 
+def clearSheet(a):
+    i=0
+    if a==1:
+        filename = 'Config/词库.xlsx'
+    else:
+        filename= 'Config/完全匹配.xlsx'
+    while i<4:
 
+        wb = load_workbook(filename)
+        ws = wb.active
+        ws.delete_cols(1)  # 删除第 1 列数据
+        wb.save(filename)
+        i+=1
+    time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time1 + '| clear，已清除xlsx')
+def outPutDic(a):
+    clearSheet(a)
+    if a==1:
+        filename = 'Config/完全匹配.xlsx'
+        file = open('Config\\dict.txt', 'r')
+        js = file.read()
+        dict = json.loads(js)
+        Keys = dict.keys()
+
+    else:
+
+
+        filename = 'Config/词库.xlsx'
+        file = open('Config\\superDict.txt', 'r')
+        jss = file.read()
+        dict = json.loads(jss)
+        Keys = dict.keys()
+    time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time1 + '| 已读取字典')
+
+
+
+
+
+
+
+    wb = openpyxl.load_workbook(filename)
+    sheet = wb.active
+    sheet.append(['key', 'value'])  # 插入一行数据
+    for d in Keys:
+        key=d
+        values=dict.get(d)
+
+        for value in values:
+
+            #print(str(key)+str(value))
+
+            sheet.append([key, value])  # 插入一行数据
+    wb.save(filename)  # 保存,传入原文件则在
+    time1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(time1 + '| 词库已同步至xlsx')
 
 
 

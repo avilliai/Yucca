@@ -80,14 +80,7 @@ def main(bot):
             text = random.choice(pero_dog_contents).replace('*', '')
             await bot.send(event, text)
 
-    # 追加推送群聊
-    @bot.on(GroupMessage)
-    async def addGroup(event: GroupMessage):
-        if str(event.message_chain).startswith('添加群#'):
-            s = str(event.message_chain).split('#')
-            with open('Config\\moyu\\groups.txt', 'a') as file:
-                file.write('\n' + s[1])
-                await bot.send(event, '已追加')
+
 
 
 
